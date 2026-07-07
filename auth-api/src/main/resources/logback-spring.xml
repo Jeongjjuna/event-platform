@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <property name="LOG_DIR" value="/var/log/was/ontongsal"/>
+    <property name="LOG_PATTERN"
+              value="[%d{HH:mm:ss.SSS}][%green(%t)][%X{traceId:-}][%highlight(%5level)] %36.36logger{36} : %msg%n"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="logback-spring-${spring.profiles.active}.xml"/>
+</configuration>

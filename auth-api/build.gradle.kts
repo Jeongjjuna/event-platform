@@ -20,12 +20,36 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-h2console")
+    // spring webmvc
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("tools.jackson.module:jackson-module-kotlin")
-    runtimeOnly("com.h2database:h2")
-    runtimeOnly("com.mysql:mysql-connector-j")
+
+    // spring validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    // spring security
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
+
+    // logging
+    implementation("io.github.oshai:kotlin-logging-jvm:8.0.01")
+
+    // db
+    implementation("org.springframework.boot:spring-boot-h2console")
+    runtimeOnly("com.h2database:h2")           // 로컬용
+    runtimeOnly("com.mysql:mysql-connector-j") // 운영용
+
+    // spring transaction
+    implementation("org.springframework:spring-tx")
+
+    // spring exposed
+    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:1.3.0")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:1.3.0")
+
+    // test
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
