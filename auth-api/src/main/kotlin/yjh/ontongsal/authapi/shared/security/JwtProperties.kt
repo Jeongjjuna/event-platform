@@ -6,7 +6,8 @@ import java.time.Duration
 @ConfigurationProperties(prefix = "jwt")
 data class JwtProperties(
     val issuer: String,
-    val secretKey: String,
+    val privateKey: String,
+    val publicKey: String,
     val accessTokenExpiration: Duration,
     val refreshTokenExpiration: Duration
 )

@@ -1,10 +1,11 @@
 package yjh.ontongsal.authapi
 
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
+import yjh.ontongsal.authapi.config.IntegrationTest
 
-@SpringBootTest
-class AuthApiApplicationTests {
+@DisplayName("[통합테스트] 애플리케이션 로드 테스트")
+class AuthApiApplicationTests : IntegrationTest() {
 
     @Test
     fun contextLoads() {
