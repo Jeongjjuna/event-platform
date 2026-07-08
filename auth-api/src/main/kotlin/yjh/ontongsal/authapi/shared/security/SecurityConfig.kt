@@ -35,6 +35,7 @@ class SecurityConfig {
                 it
                     .requestMatchers("/h2-console/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/v1/users/signup").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/v1/users/login").permitAll()
                     .anyRequest().authenticated()
             }
 

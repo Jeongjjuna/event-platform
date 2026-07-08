@@ -41,3 +41,9 @@ logging:
   level:
     yjh.ontongsal.testing: DEBUG
     org.springframework.web: DEBUG
+
+jwt:
+  issuer: auth-api
+  secret-key: dGhpcy1pcy1hLXNhbXBsZS1zZWNyZXQta2V5LWZvci1qd3QtMjU2LWJpdHMK # 최소 256비트 이상의 Base64 인코딩 키
+  access-token-expiration: 30m  # 30분
+  refresh-token-expiration: 14d # 14일
