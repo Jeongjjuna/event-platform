@@ -8,6 +8,7 @@ import io.jsonwebtoken.io.Decoders
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.shared.security.SecurityUserDetails
@@ -100,7 +101,9 @@ class JwtTokenProvider(
             userId = jwtUserInfo.userId,
             email = jwtUserInfo.email,
             password = "",
-            authorities = emptyList(),
+            authorities = listOf(
+                SimpleGrantedAuthority(jwtUserInfo.role)
+            ),
         )
 
         return UsernamePasswordAuthenticationToken(

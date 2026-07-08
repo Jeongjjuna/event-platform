@@ -1,6 +1,7 @@
 package yjh.ontongsal.authapi.presentation
 
 import jakarta.validation.Valid
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import yjh.ontongsal.authapi.application.LoginService
@@ -32,6 +33,7 @@ class UserController(
         return ok(LoginResponse.from(loginResult))
     }
 
+    @PreAuthorize("hasAuthority('USER')")
     @GetMapping(value = ["/me"], version = "v1")
     fun getMyInfo(
         @AuthenticationPrincipal principal: SecurityUserDetails,
