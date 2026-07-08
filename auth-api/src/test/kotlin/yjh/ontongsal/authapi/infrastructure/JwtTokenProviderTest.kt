@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import yjh.ontongsal.authapi.config.IntegrationTest
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserRole
+import yjh.ontongsal.authapi.shared.security.jwt.JwtTokenProvider
 import java.security.KeyPairGenerator
 import java.util.*
 import kotlin.time.Clock
 
 @DisplayName("[통합테스트] TokenProvider")
-class TokenProviderTest @Autowired constructor(
-    private val sut: TokenProvider
+class JwtTokenProviderTest @Autowired constructor(
+    private val sut: JwtTokenProvider
 ) : IntegrationTest() {
 
     @Test
