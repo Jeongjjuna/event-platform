@@ -52,6 +52,10 @@ dependencies {
     // spring redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
+    // spring cache(caffeine)
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("com.github.ben-manes.caffeine:caffeine")
+
     // test
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

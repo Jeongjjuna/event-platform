@@ -1,8 +1,8 @@
 package yjh.ontongsal.authapi.application
 
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import yjh.ontongsal.authapi.domain.CachedUser
-import yjh.ontongsal.authapi.infrastructure.UserCacheRepository
 import yjh.ontongsal.authapi.infrastructure.UserRepository
 
 /**
@@ -11,6 +11,8 @@ import yjh.ontongsal.authapi.infrastructure.UserRepository
 @Component
 class UserCache(
     private val userRepository: UserRepository,
+
+    @Qualifier("userCaffeineCacheRepository")
     private val userCacheRepository: UserCacheRepository,
 ) {
 

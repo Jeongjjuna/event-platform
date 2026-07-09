@@ -4,36 +4,27 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 import tools.jackson.databind.ObjectMapper
+import yjh.ontongsal.authapi.application.UserCacheDto
+import yjh.ontongsal.authapi.application.UserCacheRepository
 import yjh.ontongsal.authapi.domain.CachedUser
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserRole
 import java.time.Duration
-import kotlin.time.Instant
 
 private val log = KotlinLogging.logger {}
 
-/**
- * Redis에 JSON 형태로 저장하기 위한 캐시 전용 DTO
- */
-data class UserCacheDto(
-    val id: Int,
-    val email: String,
-    val role: String,
-    val createdAt: Instant,
-)
-
 @Repository
-class UserCacheRepository(
+class UserRedisCacheRepository(
     private val redisTemplate: RedisTemplate<String, String>,
     private val objectMapper: ObjectMapper
-) {
+) : UserCacheRepository {
 
     companion object {
         private const val KEY_PREFIX = "user:email:"
         private val TTL = Duration.ofMinutes(30)
     }
 
-    fun get(email: String): CachedUser? {
+    override fun get(email: String): CachedUser? {
         val key = "$KEY_PREFIX$email"
 
         return try {
@@ -47,11 +38,12 @@ class UserCacheRepository(
         }
     }
 
-    fun set(email: String, user: User): CachedUser {
+    override fun set(email: String, user: User): CachedUser {
         val key = "$KEY_PREFIX$email"
 
         try {
-            val dto = UserCacheDto(id = user.id!!, email = user.email, role = user.role.name, createdAt = user.createdAt)
+            val dto =
+                UserCacheDto(id = user.id!!, email = user.email, role = user.role.name, createdAt = user.createdAt)
 
             val jsonString = objectMapper.writeValueAsString(dto)
             redisTemplate.opsForValue().set(key, jsonString, TTL)
