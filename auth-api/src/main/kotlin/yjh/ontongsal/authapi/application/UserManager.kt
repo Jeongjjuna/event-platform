@@ -19,7 +19,7 @@ class UserManager(
 ) {
 
     fun checkAlreadyRegistered(email: String) {
-        val user = userReader.read(email)
+        val user = userReader.find(email)
         if (user != null) {
             throw AppException.Conflict(ErrorCode.USER_CONFLICT)
         }
@@ -37,7 +37,7 @@ class UserManager(
     }
 
     fun authenticate(loginInfo: LoginInfo): User {
-        val user = userReader.read(loginInfo.email)
+        val user = userReader.find(loginInfo.email)
             ?: throw AppException.Unauthorized(ErrorCode.LOGIN_FAILED)
 
         if (!credentialEncoder.matches(loginInfo.password, user.password)) {

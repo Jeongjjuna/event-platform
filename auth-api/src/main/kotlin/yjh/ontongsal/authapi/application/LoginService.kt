@@ -33,6 +33,5 @@ class LoginService(
 
     fun getMyInfo(userId: Long, email: String): User {
         return userReader.read(email)
-            ?: throw AppException.NotFound(ErrorCode.USER_NOT_FOUND)
     }
 }
