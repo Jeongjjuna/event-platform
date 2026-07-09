@@ -49,6 +49,9 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-spring-boot-starter:1.3.0")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:1.3.0")
 
+    // spring redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
     // test
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

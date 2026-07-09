@@ -38,7 +38,7 @@ class UserController(
     fun getMyInfo(
         @AuthenticationPrincipal principal: SecurityUserDetails,
     ): ApiResponseEntity<MyInfoResponse> {
-        val user = loginService.getMyInfo(principal.userId, principal.username) // username == email
-        return ok(MyInfoResponse.from(user))
+        val cachedUser = loginService.getMyInfo(principal.userId, principal.username) // username == email
+        return ok(MyInfoResponse.from(cachedUser))
     }
 }
