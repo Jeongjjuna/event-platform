@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 import yjh.ontongsal.authapi.application.UserCacheRepository
 import yjh.ontongsal.authapi.domain.CachedUser
 import yjh.ontongsal.authapi.domain.User
-import yjh.ontongsal.authapi.shared.caffeine.LocalCache
+import yjh.ontongsal.authapi.shared.cache.CacheType
 
 private val log = KotlinLogging.logger {}
 
@@ -19,18 +19,13 @@ class UserCaffeineCacheRepository(
     private val cacheManager: CacheManager
 ) : UserCacheRepository {
 
-    private val cache: Cache =
-        requireNotNull(cacheManager.getCache(LocalCache.USER_INFO.name))
-
-    companion object {
-        private const val KEY_PREFIX = "user:email:"
-    }
+    private val cacheType: CacheType = CacheType.from(CacheType.Name.USER_INFO)
+    private val cache: Cache = requireNotNull(cacheManager.getCache(cacheType.cacheName))
 
     override fun get(email: String): CachedUser? {
-        val key = "$KEY_PREFIX$email"
-
+        // 캐시 이름(user_info)으로 이미 격리된 캐시이므로 email을 그대로 키로 사용한다.
         return try {
-            cache.get<CachedUser>(key)
+            cache.get<CachedUser>(email)
         } catch (e: Exception) {
             log.error(e) { "[UserCache] Failed to get user data from Caffeine. Returning null. email=$email" }
             null
@@ -38,8 +33,6 @@ class UserCaffeineCacheRepository(
     }
 
     override fun set(email: String, user: User): CachedUser {
-        val key = "$KEY_PREFIX$email"
-
         val cachedUser = CachedUser(
             id = user.id!!,
             email = user.email,
@@ -48,7 +41,7 @@ class UserCaffeineCacheRepository(
         )
 
         try {
-            cache.put(key, cachedUser)
+            cache.put(email, cachedUser)
         } catch (e: Exception) {
             log.error(e) { "[UserCache] Failed to set user data to Caffeine. Ignored. email=$email" }
         }

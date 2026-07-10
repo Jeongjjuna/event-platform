@@ -9,7 +9,7 @@ import yjh.ontongsal.authapi.application.UserCacheRepository
 import yjh.ontongsal.authapi.domain.CachedUser
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserRole
-import java.time.Duration
+import yjh.ontongsal.authapi.shared.cache.CacheType
 
 private val log = KotlinLogging.logger {}
 
@@ -20,8 +20,10 @@ class UserRedisCacheRepository(
 ) : UserCacheRepository {
 
     companion object {
-        private const val KEY_PREFIX = "user:email:"
-        private val TTL = Duration.ofMinutes(30)
+        private val CACHE_TYPE = CacheType.from(CacheType.Name.USER_INFO)
+
+        // Redis는 키 공간이 평평하므로 캐시 이름을 프리픽스로 사용해 격리한다. (예: user_info:{email})
+        private val KEY_PREFIX = CACHE_TYPE.cacheName + ":"
     }
 
     override fun get(email: String): CachedUser? {
@@ -46,7 +48,7 @@ class UserRedisCacheRepository(
                 UserCacheDto(id = user.id!!, email = user.email, role = user.role.name, createdAt = user.createdAt)
 
             val jsonString = objectMapper.writeValueAsString(dto)
-            redisTemplate.opsForValue().set(key, jsonString, TTL)
+            redisTemplate.opsForValue().set(key, jsonString, CACHE_TYPE.globalTtl)
         } catch (e: Exception) {
             log.error(e) { "[UserCache] Failed to set user data to Redis. Ignored. email=$email" }
         }
