@@ -46,8 +46,8 @@ dependencies {
     implementation("org.springframework:spring-tx")
 
     // spring exposed
-    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:1.3.0")
-    implementation("org.jetbrains.exposed:exposed-java-time:1.3.0")
+    implementation("org.jetbrains.exposed:exposed-spring-boot4-starter:1.3.1")
+    implementation("org.jetbrains.exposed:exposed-java-time:1.3.1")
 
     // spring redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
