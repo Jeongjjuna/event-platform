@@ -1,6 +1,7 @@
 package yjh.ontongsal.authapi.application
 
 import org.springframework.stereotype.Component
+import yjh.ontongsal.authapi.domain.LoginInfo
 import yjh.ontongsal.authapi.domain.SignUpInfo
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.infrastructure.UserRepository
@@ -33,5 +34,15 @@ class UserManager(
             password = hashedPassword
         )
         userRepository.save(user)
+    }
+
+    fun authenticate(loginInfo: LoginInfo): User {
+        val user = userReader.read(loginInfo.email)
+            ?: throw AppException.Unauthorized(ErrorCode.LOGIN_FAILED)
+
+        if (!credentialEncoder.matches(loginInfo.password, user.password)) {
+            throw AppException.Unauthorized(ErrorCode.LOGIN_FAILED)
+        }
+        return user
     }
 }

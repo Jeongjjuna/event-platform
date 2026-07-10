@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import yjh.ontongsal.authapi.application.LoginService
 import yjh.ontongsal.authapi.application.SignUpService
 import yjh.ontongsal.authapi.shared.response.ApiController
 import yjh.ontongsal.authapi.shared.response.ApiResponseEntity
@@ -12,7 +13,8 @@ import yjh.ontongsal.authapi.shared.response.ApiResponseEntity
 @RequestMapping("/api/{version}/users")
 @RestController
 class UserController(
-    private val signUpService: SignUpService
+    private val signUpService: SignUpService,
+    private val loginService: LoginService,
 ) : ApiController {
 
     @PostMapping(value = ["/signup"], version = "v1")
@@ -21,5 +23,13 @@ class UserController(
     ): ApiResponseEntity<Unit> {
         signUpService.signUp(signUpRequest.toSignUpInfo())
         return ok()
+    }
+
+    @PostMapping(value = ["/login"], version = "v1")
+    fun login(
+        @Valid @RequestBody loginRequest: LoginRequest
+    ): ApiResponseEntity<LoginResponse> {
+        val loginResult = loginService.login(loginRequest.toLoginInfo())
+        return ok(LoginResponse.from(loginResult))
     }
 }

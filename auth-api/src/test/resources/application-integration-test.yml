@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: auth-api
+
+  mvc:
+    apiversion:
+      use:
+        path-segment: 1
+
+  config:
+    activate:
+      on-profile: integration-test
+
+  sql:
+    init:
+      mode: always
+      platform: h2
+      schema-locations: classpath:db/schema-h2.sql
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:EVENT_PLATFORM_DB;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2s
+
+logging:
+  level:
+    yjh.ontongsal.testing: DEBUG
+    org.springframework.web: DEBUG
+
+jwt:
+  issuer: auth-api
+  private-key: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDdgJHU9epS5dfCTn4B27WgbAiuQOiLTrU9NUMpSHczINKVOQqhN75Ob0tp+SN1a4uiqF06FCgflpJscAYAv5E4ccU8o7UiUpKRsE5MvoQeDbPJuu4WaGbq3GnHstlvQn3Ohu7UWJJrcXJi6qILu04SrIrARD1w2Wm665BFyQ1vrbD3oTmvAFLlERXvPjkmhcsNmCGXGVm3MvNS2ayq9fdKqaStY/3K/+HjsC90NBzWHIf9VfpPK/+/BoCMnIeDeql7UVRTYPClmuBvG3yJV9+0l+X19O1CxR15Zg0fts6KBAE7uxGIZNhmmFgVrBaEPr9g3Hfw9cXH0YbfjDyaO72NAgMBAAECggEAEuWk9hAJhDYDVhqVNHphQJpG6VA0pqyPLiAiUTN9++ODzmL17bLQQ70fUsoEWkBTwuDt8duwtUqGxm/jizfMtLiRall7Gr5ZrnU7UN/Qwgb1kjMmRyIeuaXBSTNlyntX5AFDVI6+kHe2xF/zyuAZdTgO2aquD+J0hekSlL7mLGNH65ceUN6mkV01X17moUhMJz7acLHxKheSw4Pa/ujOJ/SN0ixTboIiH9nrwvFKWl1p7LkXss8WwJd/Xa/hv2rQbSJcfMeNZY9OGVal90VvG53rNqXlQZIWpCIAERrlaz5wASCIW13HSrbbAcRABtuuyJ6UUKJfdd3/dBR4KRLwDwKBgQD732eLTpATOcIfUng0iS4lgb1im6YAY8R9cIJFF/n93sB9x5tUsydZwYO3yIGWvISmDF3/7SFtaAOyWU+SxXi51sPMgXYOmo/x9Ra29t+oHJx5gD069JYLjlJ3bxpt5AWlAPpVSrYJ+TXLC2jymgd0ltZAgpjJuln8WUfXc0VyewKBgQDhIcMsuaHStj0gU/H3JR4x9sQDHD8ql3Gv+b2RrZCYJM9Yol01xavcZ34NybseP8JnrWriBXxoy63GM8MsEbPU3CuYY2UKe5WWtmwwhoYecHWiuK7XWSYzWu0tDDF1EgabEYsW6wokqKv3lGdWG3Mk1WSrYh86wP15kIy99+l1lwKBgGwXItuQ2pm1ls5UWQvKt0gXVowj2eie6CshBnbaZEmDt74C1HFT9RY6yukrHhnvS0nrUsfLHyZRlgyK8XA+WKIAPcTc5io8QHwIvzfD2JXPuYMW+q/7WQ0ahd+FiaURTy7RrZy+1EKRdXluqxo56esp9EZ5BVLFK2r1cbRPXsVTAoGBAIwOWACD/5M5wm9RKe+pzM4iiTCyKu3RR23FvVRamOC9zayDXd9s+Qzl6XqkbF9WJRggv6Sa6xm61IHAhAPvg2PCEPD9rMdHuPkIxeeuWNOo/NXddRANqwE56OEke8QsEaX41QHN+QJzWIBud5cO/qQEiVtBcNI5a7dr4NLx3vBDAoGAQUwUTnYJKijv6NdIJW+6Cgb7aSJo78v0zlzhXcHMk5nXM/eSqMKqtNQz0gbvbIfvUOMgdinJZLzKBteCcmimCUsCUycu+l/Xu0/6yx64aqQh9yRsfpiwxGJ00qVvTB7XUbUEH5Hh1puYmoG88aehdyta63domKPa3R1hZCrSVjA=
+  public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3YCR1PXqUuXXwk5+Adu1oGwIrkDoi061PTVDKUh3MyDSlTkKoTe+Tm9LafkjdWuLoqhdOhQoH5aSbHAGAL+ROHHFPKO1IlKSkbBOTL6EHg2zybruFmhm6txpx7LZb0J9zobu1FiSa3FyYuqiC7tOEqyKwEQ9cNlpuuuQRckNb62w96E5rwBS5REV7z45JoXLDZghlxlZtzLzUtmsqvX3SqmkrWP9yv/h47AvdDQc1hyH/VX6Tyv/vwaAjJyHg3qpe1FUU2DwpZrgbxt8iVfftJfl9fTtQsUdeWYNH7bOigQBO7sRiGTYZphYFawWhD6/YNx38PXFx9GG34w8mju9jQIDAQAB
+  access-token-expiration: 30m  # 30분
+  refresh-token-expiration: 14d # 14일
