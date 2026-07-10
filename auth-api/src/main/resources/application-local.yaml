@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: auth-api
+
+  mvc:
+    apiversion:
+      use:
+        path-segment: 1
+
+  config:
+    activate:
+      on-profile: local
+
+  sql:
+    init:
+      mode: always
+      platform: h2
+      schema-locations: classpath:db/schema-h2.sql
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:EVENT_PLATFORM_DB;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2s
+
+logging:
+  level:
+    yjh.ontongsal.testing: DEBUG
+    org.springframework.web: DEBUG
