@@ -1,7 +1,6 @@
 package yjh.ontongsal.authapi.domain
 
-import kotlin.time.Clock
-import kotlin.time.Instant
+import java.time.Instant
 
 class User(
     val id: Int?,
@@ -20,8 +19,8 @@ class User(
                 email = email,
                 password = password,
                 role = UserRole.USER,
-                createdAt = Clock.System.now(),
-                updatedAt = Clock.System.now(),
+                createdAt = Instant.now(),
+                updatedAt = Instant.now(),
                 deletedAt = null,
             )
         }

@@ -2,7 +2,7 @@ package yjh.ontongsal.authapi.presentation
 
 import yjh.ontongsal.authapi.domain.LoginResult
 import yjh.ontongsal.authapi.domain.UserRole
-import kotlin.time.Instant
+import java.time.Instant
 
 data class LoginResponse(
     val accessToken: String,

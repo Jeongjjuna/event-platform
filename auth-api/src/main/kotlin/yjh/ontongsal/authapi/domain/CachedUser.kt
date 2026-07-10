@@ -1,6 +1,6 @@
 package yjh.ontongsal.authapi.domain
 
-import kotlin.time.Instant
+import java.time.Instant
 
 data class CachedUser(
     val id: Int,

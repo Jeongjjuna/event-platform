@@ -47,7 +47,7 @@ dependencies {
 
     // spring exposed
     implementation("org.jetbrains.exposed:exposed-spring-boot-starter:1.3.0")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:1.3.0")
+    implementation("org.jetbrains.exposed:exposed-java-time:1.3.0")
 
     // spring redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
