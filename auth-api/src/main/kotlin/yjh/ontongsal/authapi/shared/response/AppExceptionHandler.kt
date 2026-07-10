@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.authorization.AuthorizationDeniedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -170,6 +171,24 @@ class AppExceptionHandler {
                     code = HttpStatus.CONFLICT.value(),
                     message = HttpStatus.CONFLICT.reasonPhrase,
                     details = listOf()
+                )
+            )
+    }
+
+    @ExceptionHandler(value = [AuthorizationDeniedException::class])
+    fun handleAuthorizationDeniedException(
+        e: AuthorizationDeniedException,
+    ): ResponseEntity<ErrorResponse> {
+
+        log.warn { "Authorization Denied : ${e.message}" }
+
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(
+                ErrorResponse(
+                    code = HttpStatus.FORBIDDEN.value(),
+                    message = HttpStatus.FORBIDDEN.reasonPhrase,
+                    details = null
                 )
             )
     }

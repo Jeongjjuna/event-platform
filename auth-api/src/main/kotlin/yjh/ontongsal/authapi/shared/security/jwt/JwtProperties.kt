@@ -1,4 +1,4 @@
-package yjh.ontongsal.authapi.shared.security
+package yjh.ontongsal.authapi.shared.security.jwt
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.time.Duration

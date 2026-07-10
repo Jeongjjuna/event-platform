@@ -1,13 +1,17 @@
-package yjh.ontongsal.authapi.infrastructure
+package yjh.ontongsal.authapi.shared.security.jwt
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import yjh.ontongsal.authapi.domain.User
-import yjh.ontongsal.authapi.shared.security.JwtProperties
+import yjh.ontongsal.authapi.shared.security.SecurityUserDetails
 import java.security.KeyFactory
 import java.security.PrivateKey
 import java.security.PublicKey
@@ -20,7 +24,7 @@ private val log = KotlinLogging.logger {}
 
 @EnableConfigurationProperties(JwtProperties::class)
 @Component
-class TokenProvider(
+class JwtTokenProvider(
     private val jwtProperties: JwtProperties,
 ) {
     private val privateKey: PrivateKey
@@ -88,5 +92,52 @@ class TokenProvider(
             log.info { "JWT 토큰 문자열이 비어 있거나 잘못되었습니다." }
         }
         return false
+    }
+
+    fun getAuthentication(token: String): Authentication {
+        val jwtUserInfo: JwtUserInfo = getUserInfo(token)
+
+        val userDetails = SecurityUserDetails(
+            userId = jwtUserInfo.userId,
+            email = jwtUserInfo.email,
+            password = "",
+            authorities = listOf(
+                SimpleGrantedAuthority(jwtUserInfo.role)
+            ),
+        )
+
+        return UsernamePasswordAuthenticationToken(
+            userDetails,
+            token,
+            userDetails.authorities
+        )
+    }
+
+    private fun getUserInfo(token: String): JwtUserInfo {
+        val claims = getClaims(token)
+
+        val userId = getClaims(token).subject.toLong()
+        val email = claims.get("email", String::class.java)
+        val role = claims.get("role", String::class.java)
+
+        return JwtUserInfo(
+            userId = userId,
+            email = email,
+            role = role,
+        )
+    }
+
+    private fun getClaims(token: String): Claims {
+        return try {
+            Jwts.parser()
+                .verifyWith(publicKey)
+                .build()
+                .parseSignedClaims(token)
+                .payload
+        } catch (e: JwtException) {
+            throw InvalidJwtException("유효하지 않은 JWT 토큰", e)
+        } catch (e: Exception) {
+            throw InvalidJwtException("JWT 토큰 파싱 에러", e)
+        }
     }
 }
