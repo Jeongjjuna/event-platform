@@ -25,6 +25,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("tools.jackson.module:jackson-module-kotlin")
 
+    // spring aspectj(aop)
+    implementation("org.springframework.boot:spring-boot-starter-aspectj")
+
     // spring validation
     implementation("org.springframework.boot:spring-boot-starter-validation")
 

@@ -31,8 +31,12 @@ class MdcFilter(
         MDC.put(TRACE_ID, traceId)
 
         response.setHeader("X-Service-Name", applicationName)
-        filterChain.doFilter(request, response)
 
-        MDC.remove(TRACE_ID)
+        try {
+            filterChain.doFilter(request, response)
+        } finally {
+            MDC.remove(TRACE_ID) // MDC 정리
+            LogDepth.clear()     // 계층 로그 뎁스 정리
+        }
     }
 }

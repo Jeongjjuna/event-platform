@@ -57,7 +57,7 @@ class LogFilter : OncePerRequestFilter() {
             "body" to requestBody,
             "headers" to headers,
         )
-        log.info { logMap }
+        log.info { "[Filter] $logMap" }
     }
 
     /**
@@ -78,7 +78,7 @@ class LogFilter : OncePerRequestFilter() {
             "uri" to uri,
             "body" to responseBody
         )
-        log.info { logMap }
+        log.info { "[Filter] $logMap" }
     }
 
     private fun getHeaders(request: HttpServletRequest): Map<String, String> {

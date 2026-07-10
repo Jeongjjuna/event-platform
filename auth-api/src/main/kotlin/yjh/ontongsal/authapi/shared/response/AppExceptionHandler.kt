@@ -28,7 +28,7 @@ class AppExceptionHandler {
             "${it.methodName}(${it.fileName}:${it.lineNumber})"
         }
 
-        log.warn { "AppException : (${e.code}) ${e.message} - $location" }
+        log.warn { "[ExceptionHandler] : (${e.code}) ${e.message} - $location" }
 
         val response = ErrorResponse(
             code = e.code,
@@ -50,7 +50,7 @@ class AppExceptionHandler {
         e: MethodArgumentNotValidException,
     ): ResponseEntity<ErrorResponse> {
 
-        log.warn { "Validation Exception" }
+        log.warn { "[ExceptionHandler] Validation Exception" }
 
         val errors = e.bindingResult.fieldErrors.map {
             ErrorDetail(
@@ -76,7 +76,7 @@ class AppExceptionHandler {
         e: ConstraintViolationException,
     ): ResponseEntity<ErrorResponse> {
 
-        log.warn { "Constraint Violation" }
+        log.warn { "[ExceptionHandler] Constraint Violation" }
 
         val errors = e.constraintViolations.map {
             ErrorDetail(
@@ -102,7 +102,7 @@ class AppExceptionHandler {
         e: MissingServletRequestParameterException,
     ): ResponseEntity<ErrorResponse> {
 
-        log.warn { "Missing Request Param" }
+        log.warn { "[ExceptionHandler] Missing Request Param" }
 
         val error = ErrorDetail(
             field = e.parameterName,
@@ -126,7 +126,7 @@ class AppExceptionHandler {
         e: HttpMessageNotReadableException,
     ): ResponseEntity<ErrorResponse> {
 
-        log.warn { "Http Message Not Readable" }
+        log.warn { "[ExceptionHandler] Http Message Not Readable" }
 
         val reason = when (e.cause) {
             is InvalidFormatException -> "invalid format"
@@ -162,7 +162,7 @@ class AppExceptionHandler {
         e: DataIntegrityViolationException,
     ): ResponseEntity<ErrorResponse> {
 
-        log.error(e) { "Data Integrity Violation" }
+        log.error(e) { "[ExceptionHandler] Data Integrity Violation" }
 
         return ResponseEntity
             .status(HttpStatus.CONFLICT)
@@ -180,7 +180,7 @@ class AppExceptionHandler {
         e: AuthorizationDeniedException,
     ): ResponseEntity<ErrorResponse> {
 
-        log.warn { "Authorization Denied : ${e.message}" }
+        log.warn { "[ExceptionHandler] Authorization Denied : ${e.message}" }
 
         return ResponseEntity
             .status(HttpStatus.FORBIDDEN)
@@ -195,7 +195,7 @@ class AppExceptionHandler {
 
     @ExceptionHandler(value = [Exception::class])
     fun handleException(e: Exception, request: WebRequest): ResponseEntity<ErrorResponse> {
-        log.error(e) { "Exception : ${e.message}" }
+        log.error(e) { "[ExceptionHandler] Exception : ${e.message}" }
 
         val response = ErrorResponse(
             code = HttpStatus.INTERNAL_SERVER_ERROR.value(),
