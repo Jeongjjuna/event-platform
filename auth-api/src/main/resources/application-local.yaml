@@ -39,8 +39,9 @@ spring:
 
 logging:
   level:
+    yjh.ontongsal.authapi: DEBUG
     yjh.ontongsal.testing: DEBUG
-    org.springframework.web: DEBUG
+    org.springframework.web: INFO
 
 jwt:
   issuer: auth-api

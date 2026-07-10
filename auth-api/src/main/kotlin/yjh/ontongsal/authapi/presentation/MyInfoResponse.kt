@@ -2,7 +2,7 @@ package yjh.ontongsal.authapi.presentation
 
 import yjh.ontongsal.authapi.domain.CachedUser
 import yjh.ontongsal.authapi.domain.User
-import kotlin.time.Instant
+import java.time.Instant
 
 data class MyInfoResponse(
     val userId: Int,

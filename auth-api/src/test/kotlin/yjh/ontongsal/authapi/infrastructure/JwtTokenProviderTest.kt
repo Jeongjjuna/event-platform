@@ -11,8 +11,8 @@ import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserRole
 import yjh.ontongsal.authapi.shared.security.jwt.JwtTokenProvider
 import java.security.KeyPairGenerator
+import java.time.Instant
 import java.util.*
-import kotlin.time.Clock
 
 @DisplayName("[통합테스트] TokenProvider")
 class JwtTokenProviderTest @Autowired constructor(
@@ -92,8 +92,8 @@ class JwtTokenProviderTest @Autowired constructor(
             email = "test@example.com",
             password = "encodedPassword123!",
             role = UserRole.USER,
-            createdAt = Clock.System.now(),
-            updatedAt = Clock.System.now(),
+            createdAt = Instant.now(),
+            updatedAt = Instant.now(),
             deletedAt = null
         )
     }

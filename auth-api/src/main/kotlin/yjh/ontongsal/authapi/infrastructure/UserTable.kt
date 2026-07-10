@@ -1,7 +1,7 @@
 package yjh.ontongsal.authapi.infrastructure
 
 import org.jetbrains.exposed.v1.core.Table
-import org.jetbrains.exposed.v1.datetime.timestamp
+import org.jetbrains.exposed.v1.javatime.timestamp
 
 object UserTable : Table("users") {
     val id = integer("id").autoIncrement()

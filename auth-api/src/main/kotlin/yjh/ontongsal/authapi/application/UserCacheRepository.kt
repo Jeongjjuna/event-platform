@@ -2,7 +2,7 @@ package yjh.ontongsal.authapi.application
 
 import yjh.ontongsal.authapi.domain.CachedUser
 import yjh.ontongsal.authapi.domain.User
-import kotlin.time.Instant
+import java.time.Instant
 
 /**
  * Redis에 JSON 형태로 저장하기 위한 캐시 전용 DTO
