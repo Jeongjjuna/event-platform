@@ -5,7 +5,7 @@ import yjh.ontongsal.authapi.domain.User
 import java.time.Instant
 
 data class MyInfoResponse(
-    val userId: Int,
+    val userId: Long,
     val email: String,
     val role: String,
     val registeredAt: Instant,

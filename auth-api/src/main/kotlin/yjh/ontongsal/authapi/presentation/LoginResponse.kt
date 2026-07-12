@@ -11,7 +11,7 @@ data class LoginResponse(
 ) {
 
     data class UserResponse(
-        val id: Int,
+        val id: Long,
         val email: String,
         val role: UserRole,
         val registeredAt: Instant,
