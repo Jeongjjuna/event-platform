@@ -4,7 +4,7 @@ import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.javatime.timestamp
 
 object UserTable : Table("users") {
-    val id = integer("id").autoIncrement()
+    val id = long("id").autoIncrement()
     val email = varchar("email", 100).uniqueIndex()
     val password = varchar("password", 100)
     val userRole = varchar("user_role", 20)

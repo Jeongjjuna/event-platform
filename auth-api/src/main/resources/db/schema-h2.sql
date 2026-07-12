@@ -9,3 +9,10 @@ CREATE TABLE users
     updated_at TIMESTAMP    NOT NULL,
     deleted_at TIMESTAMP NULL
 );
+
+CREATE TABLE user_refresh_token
+(
+    user_id       BIGINT        NOT NULL PRIMARY KEY,
+    refresh_token VARCHAR(1024) NOT NULL,
+    updated_at    TIMESTAMP     NOT NULL
+);
