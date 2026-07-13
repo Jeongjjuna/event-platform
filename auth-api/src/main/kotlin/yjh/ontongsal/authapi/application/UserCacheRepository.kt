@@ -17,4 +17,5 @@ data class UserCacheDto(
 interface UserCacheRepository {
     fun get(email: String): CachedUser?
     fun set(email: String, user: User): CachedUser
+    fun evict(email: String)
 }

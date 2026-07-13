@@ -1,12 +1,16 @@
 package yjh.ontongsal.authapi.infrastructure
 
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.isNull
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.update
 import org.springframework.stereotype.Repository
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserRole
 import yjh.ontongsal.authapi.shared.persistence.TransactionRunner
+import java.time.Instant
 
 @Repository
 class UserRepository(
@@ -26,7 +30,7 @@ class UserRepository(
     fun findByEmail(email: String): User? = transaction.run {
         UserTable
             .selectAll()
-            .where { UserTable.email eq email }
+            .where { (UserTable.email eq email) and UserTable.deletedAt.isNull() }
             .singleOrNull()
             ?.let {
                 User(
@@ -38,6 +42,22 @@ class UserRepository(
                     updatedAt = it[UserTable.updatedAt],
                     deletedAt = it[UserTable.deletedAt],
                 )
+            }
+    }
+
+    fun updatePassword(userId: Long, hashedPassword: String): Int = transaction.run {
+        UserTable
+            .update({ (UserTable.id eq userId) and UserTable.deletedAt.isNull() }) {
+                it[UserTable.password] = hashedPassword
+                it[UserTable.updatedAt] = Instant.now()
+            }
+    }
+
+    fun softDeleteById(userId: Long): Int = transaction.run {
+        UserTable
+            .update({ (UserTable.id eq userId) and UserTable.deletedAt.isNull() }) {
+                it[UserTable.deletedAt] = Instant.now()
+                it[UserTable.updatedAt] = Instant.now()
             }
     }
 }

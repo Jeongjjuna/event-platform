@@ -1,5 +1,6 @@
 package yjh.ontongsal.authapi.infrastructure
 
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Repository
@@ -41,4 +42,11 @@ class UserAnnotationCacheRepository : UserCacheRepository {
             role = user.role,
             createdAt = user.createdAt
         )
+
+    /**
+     * 캐시에서 해당 키를 제거한다.
+     */
+    @CacheEvict(cacheNames = [CacheType.Name.USER_INFO], cacheManager = CACHE_MANAGER, key = "#email")
+    override fun evict(email: String) {
+    }
 }
