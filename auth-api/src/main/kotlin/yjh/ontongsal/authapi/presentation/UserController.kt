@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import yjh.ontongsal.authapi.application.LoginService
+import yjh.ontongsal.authapi.application.LogoutService
 import yjh.ontongsal.authapi.application.RefreshService
 import yjh.ontongsal.authapi.application.SignUpService
 import yjh.ontongsal.authapi.shared.response.ApiController
@@ -17,6 +18,7 @@ class UserController(
     private val signUpService: SignUpService,
     private val loginService: LoginService,
     private val refreshService: RefreshService,
+    private val logoutService: LogoutService,
 ) : ApiController {
 
     @PostMapping(value = ["/signup"], version = "v1")
@@ -41,6 +43,16 @@ class UserController(
     ): ApiResponseEntity<RefreshResponse> {
         val (accessToken, refreshToken) = refreshService.refreshToken(refreshRequest.refreshToken)
         return ok(RefreshResponse.from(accessToken, refreshToken))
+    }
+
+
+    @PreAuthorize("hasAuthority('USER')")
+    @PostMapping(value = ["/logout"], version = "v1")
+    fun logout(
+        @AuthenticationPrincipal principal: SecurityUserDetails,
+    ): ApiResponseEntity<Unit> {
+        logoutService.logout(principal.userId)
+        return ok()
     }
 
     @PreAuthorize("hasAuthority('USER')")
