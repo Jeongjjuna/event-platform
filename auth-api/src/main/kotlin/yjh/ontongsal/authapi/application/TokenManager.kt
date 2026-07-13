@@ -30,7 +30,7 @@ class TokenManager(
         val userRefreshToken = refreshTokenRepository.findByUserId(jwtUserInfo.userId)
             ?: throw AppException.Unauthorized(ErrorCode.INVALID_REFRESH_TOKEN)
 
-        if(userRefreshToken.hasRefreshToken(refreshToken)) {
+        if(!userRefreshToken.hasRefreshToken(refreshToken)) {
             throw AppException.Unauthorized(ErrorCode.INVALID_REFRESH_TOKEN)
         }
 
