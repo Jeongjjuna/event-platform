@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserRole
 import yjh.ontongsal.authapi.shared.persistence.TransactionRunner
-import java.time.Instant
 
 @Repository
 class UserRepository(
@@ -45,19 +44,19 @@ class UserRepository(
             }
     }
 
-    fun updatePassword(userId: Long, hashedPassword: String): Int = transaction.run {
+    fun updatePassword(user: User): Int = transaction.run {
         UserTable
-            .update({ (UserTable.id eq userId) and UserTable.deletedAt.isNull() }) {
-                it[UserTable.password] = hashedPassword
-                it[UserTable.updatedAt] = Instant.now()
+            .update({ (UserTable.id eq user.id!!) and UserTable.deletedAt.isNull() }) {
+                it[UserTable.password] = user.password
+                it[UserTable.updatedAt] = user.updatedAt
             }
     }
 
-    fun softDeleteById(userId: Long): Int = transaction.run {
+    fun softDelete(user: User): Int = transaction.run {
         UserTable
-            .update({ (UserTable.id eq userId) and UserTable.deletedAt.isNull() }) {
-                it[UserTable.deletedAt] = Instant.now()
-                it[UserTable.updatedAt] = Instant.now()
+            .update({ (UserTable.id eq user.id!!) and UserTable.deletedAt.isNull() }) {
+                it[UserTable.deletedAt] = user.deletedAt
+                it[UserTable.updatedAt] = user.updatedAt
             }
     }
 }

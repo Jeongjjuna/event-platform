@@ -13,7 +13,7 @@ class WithdrawService(
 
     fun withdraw(userId: Long, email: String) {
         transaction.run {
-            userManager.withdraw(userId)
+            userManager.withdraw(email)
             tokenManager.deleteRefreshToken(userId)
         }
         userCache.evict(email)

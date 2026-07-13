@@ -57,11 +57,14 @@ class UserManager(
         val hashedPassword = credentialEncoder.hash(changePasswordInfo.newPassword)
             ?: throw AppException.BadRequest(ErrorCode.INVALID_PASSWORD)
 
-        userRepository.updatePassword(user.id!!, hashedPassword)
+        user.changePassword(hashedPassword)
+        userRepository.updatePassword(user)
     }
 
-    fun withdraw(userId: Long) {
-        val deleted = userRepository.softDeleteById(userId)
+    fun withdraw(email: String) {
+        val user = userReader.read(email)
+        user.withdraw()
+        val deleted = userRepository.softDelete(user)
         if (deleted == 0) {
             throw AppException.NotFound(ErrorCode.USER_NOT_FOUND)
         }
