@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
+import org.springframework.util.AntPathMatcher
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingResponseWrapper
 import tools.jackson.databind.json.JsonMapper
@@ -20,6 +21,29 @@ class LogFilter : OncePerRequestFilter() {
 
     companion object {
         const val EMPTY = "-"
+        private val EXCLUDE_PATH_PATTERNS = listOf(
+            "/h2-console/**",
+            "/favicon.ico",
+            "/error",
+            "/css/**",
+            "/js/**",
+            "/images/**",
+            "/static/**",
+            "/actuator/health",
+            "/actuator/prometheus",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+        )
+    }
+
+    private val pathMatcher = AntPathMatcher()
+
+    /**
+     * Application 로그로 남기지 않는다. > 접근 로그 기록은 Nginx 등 앞단에서 기록한다.
+     */
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        val uri = request.requestURI
+        return EXCLUDE_PATH_PATTERNS.any { pathMatcher.match(it, uri) }
     }
 
     override fun doFilterInternal(
