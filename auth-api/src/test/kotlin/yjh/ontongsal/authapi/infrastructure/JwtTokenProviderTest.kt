@@ -5,11 +5,14 @@ import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import yjh.ontongsal.authapi.config.IntegrationTest
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserRole
+import yjh.ontongsal.authapi.shared.security.jwt.InvalidJwtException
 import yjh.ontongsal.authapi.shared.security.jwt.JwtTokenProvider
+import yjh.ontongsal.authapi.shared.security.jwt.TokenType
 import java.security.KeyPairGenerator
 import java.time.Instant
 import java.util.*
@@ -70,6 +73,44 @@ class JwtTokenProviderTest @Autowired constructor(
             { assertNotNull(token) },
             { assertThat(isValid).isEqualTo(true) }
         )
+    }
+
+    @Test
+    fun `AccessToken은 REFRESH 타입 검증에 실패한다`() {
+        // given
+        val user = createDummyUser()
+        val accessToken = sut.issueAccessToken(user)
+
+        // when & then
+        assertAll(
+            { assertThat(sut.validateToken(accessToken, TokenType.ACCESS)).isEqualTo(true) },
+            { assertThat(sut.validateToken(accessToken, TokenType.REFRESH)).isEqualTo(false) }
+        )
+    }
+
+    @Test
+    fun `RefreshToken은 ACCESS 타입 검증에 실패한다`() {
+        // given
+        val user = createDummyUser()
+        val refreshToken = sut.issueRefreshToken(user)
+
+        // when & then
+        assertAll(
+            { assertThat(sut.validateToken(refreshToken, TokenType.REFRESH)).isEqualTo(true) },
+            { assertThat(sut.validateToken(refreshToken, TokenType.ACCESS)).isEqualTo(false) }
+        )
+    }
+
+    @Test
+    fun `RefreshToken으로는 인증 객체를 만들 수 없다`() {
+        // given
+        val user = createDummyUser()
+        val refreshToken = sut.issueRefreshToken(user)
+
+        // when & then
+        assertThrows<InvalidJwtException> {
+            sut.getAuthentication(refreshToken)
+        }
     }
 
     @Test
