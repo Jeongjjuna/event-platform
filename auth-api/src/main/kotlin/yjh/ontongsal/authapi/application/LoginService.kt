@@ -16,17 +16,18 @@ class LoginService(
 ) {
 
     fun login(loginInfo: LoginInfo): LoginResult {
-        val user = transaction.run {
-            userManager.authenticate(loginInfo)
+        return transaction.run {
+            val user = userManager.authenticate(loginInfo)
+
+            val (accessToken, refreshToken) = tokenManager.issue(user)
+            tokenManager.refreshToken(user.id!!, refreshToken)
+
+            return@run LoginResult(
+                user = user,
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+            )
         }
-
-        val (accessToken, refreshToken) = tokenManager.issue(user)
-
-        return LoginResult(
-            user = user,
-            accessToken = accessToken,
-            refreshToken = refreshToken,
-        )
     }
 
     fun getMyInfo(userId: Long, email: String): CachedUser {

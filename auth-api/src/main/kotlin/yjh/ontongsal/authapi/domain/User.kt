@@ -3,7 +3,7 @@ package yjh.ontongsal.authapi.domain
 import java.time.Instant
 
 class User(
-    val id: Int?,
+    val id: Long?,
     val email: String,
     val password: String,
     val role: UserRole,

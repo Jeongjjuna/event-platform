@@ -53,6 +53,7 @@ class SecurityConfig(
                     .requestMatchers("/h2-console/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/v1/users/signup").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/v1/users/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/v1/users/refresh").permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtSecurityContextFilter, UsernamePasswordAuthenticationFilter::class.java)

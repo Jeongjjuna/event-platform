@@ -61,6 +61,22 @@ class JwtTokenProvider(
             .compact()
     }
 
+    fun issueAccessToken(jwtUserInfo: JwtUserInfo): String {
+        // 만료기한 설정
+        val now = Instant.now()
+        val exp = now.plus(jwtProperties.accessTokenExpiration)
+
+        return Jwts.builder()
+            .subject(jwtUserInfo.userId.toString())
+            .issuer(jwtProperties.issuer)
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(exp))
+            .claim("email", jwtUserInfo.email)
+            .claim("role", jwtUserInfo.role)
+            .signWith(privateKey)
+            .compact()
+    }
+
     /**
      * MSA 분리환경이므로, 비대칭키(RS256) 서명 방식을 사용한다.
      */
@@ -75,6 +91,21 @@ class JwtTokenProvider(
             .expiration(Date.from(exp))
             .claim("email", user.email)
             .claim("role", user.role)
+            .signWith(privateKey)
+            .compact()
+    }
+
+    fun issueRefreshToken(jwtUserInfo: JwtUserInfo): String {
+        val now = Instant.now()
+        val exp = now.plus(jwtProperties.refreshTokenExpiration)
+
+        return Jwts.builder()
+            .subject(jwtUserInfo.userId.toString())
+            .issuer(jwtProperties.issuer)
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(exp))
+            .claim("email", jwtUserInfo.email)
+            .claim("role", jwtUserInfo.role)
             .signWith(privateKey)
             .compact()
     }
@@ -113,7 +144,7 @@ class JwtTokenProvider(
         )
     }
 
-    private fun getUserInfo(token: String): JwtUserInfo {
+    fun getUserInfo(token: String): JwtUserInfo {
         val claims = getClaims(token)
 
         val userId = getClaims(token).subject.toLong()
