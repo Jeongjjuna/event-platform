@@ -8,6 +8,7 @@ import yjh.ontongsal.authapi.shared.response.AppException
 import yjh.ontongsal.authapi.shared.response.ErrorCode
 import yjh.ontongsal.authapi.shared.security.jwt.JwtTokenProvider
 import yjh.ontongsal.authapi.shared.security.jwt.JwtUserInfo
+import yjh.ontongsal.authapi.shared.security.jwt.TokenType
 
 @Component
 class TokenManager(
@@ -22,7 +23,7 @@ class TokenManager(
 
     fun validateRefreshToken(refreshToken: String): JwtUserInfo {
 
-        if(!jwtTokenProvider.validateToken(refreshToken)) {
+        if (!jwtTokenProvider.validateToken(refreshToken, TokenType.REFRESH)) {
             throw AppException.Unauthorized(ErrorCode.INVALID_REFRESH_TOKEN)
         }
 
@@ -30,7 +31,7 @@ class TokenManager(
         val userRefreshToken = refreshTokenRepository.findByUserId(jwtUserInfo.userId)
             ?: throw AppException.Unauthorized(ErrorCode.INVALID_REFRESH_TOKEN)
 
-        if(!userRefreshToken.hasRefreshToken(refreshToken)) {
+        if (!userRefreshToken.hasRefreshToken(refreshToken)) {
             throw AppException.Unauthorized(ErrorCode.INVALID_REFRESH_TOKEN)
         }
 
@@ -48,5 +49,9 @@ class TokenManager(
         refreshTokenRepository.updateUserRefreshToken(jwtUserInfo.userId, refreshToken)
 
         return IssuedToken(accessToken = accessToken, refreshToken = refreshToken)
+    }
+
+    fun deleteRefreshToken(userId: Long) {
+        refreshTokenRepository.deleteByUserId(userId)
     }
 }

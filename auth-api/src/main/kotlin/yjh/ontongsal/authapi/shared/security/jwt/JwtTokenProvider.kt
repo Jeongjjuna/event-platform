@@ -57,6 +57,7 @@ class JwtTokenProvider(
             .expiration(Date.from(exp))
             .claim("email", user.email)
             .claim("role", user.role)
+            .claim("token_type", TokenType.ACCESS.name)
             .signWith(privateKey)
             .compact()
     }
@@ -73,6 +74,7 @@ class JwtTokenProvider(
             .expiration(Date.from(exp))
             .claim("email", jwtUserInfo.email)
             .claim("role", jwtUserInfo.role)
+            .claim("token_type", TokenType.ACCESS.name)
             .signWith(privateKey)
             .compact()
     }
@@ -91,6 +93,7 @@ class JwtTokenProvider(
             .expiration(Date.from(exp))
             .claim("email", user.email)
             .claim("role", user.role)
+            .claim("token_type", TokenType.REFRESH.name)
             .signWith(privateKey)
             .compact()
     }
@@ -106,6 +109,7 @@ class JwtTokenProvider(
             .expiration(Date.from(exp))
             .claim("email", jwtUserInfo.email)
             .claim("role", jwtUserInfo.role)
+            .claim("token_type", TokenType.REFRESH.name)
             .signWith(privateKey)
             .compact()
     }
@@ -125,7 +129,28 @@ class JwtTokenProvider(
         return false
     }
 
+    /**
+     * 서명/만료 검증에 더해 token_type 클레임이 기대한 타입과 일치하는지 검증한다.
+     */
+    fun validateToken(token: String, expectedType: TokenType): Boolean {
+        if (!validateToken(token)) {
+            return false
+        }
+
+        val tokenType = getTokenType(getClaims(token))
+        if (tokenType.isNotEqualTo(expectedType)) {
+            log.info { "JWT 토큰 타입이 일치하지 않습니다. (expected: ${expectedType.name}, actual: $tokenType)" }
+            return false
+        }
+        return true
+    }
+
     fun getAuthentication(token: String): Authentication {
+        val tokenType = getTokenType(getClaims(token))
+        if (tokenType.isNotEqualTo(TokenType.ACCESS)) {
+            throw InvalidJwtException("Access Token이 아닌 토큰으로는 인증할 수 없습니다. (token_type: $tokenType)")
+        }
+
         val jwtUserInfo: JwtUserInfo = getUserInfo(token)
 
         val userDetails = SecurityUserDetails(
@@ -156,6 +181,11 @@ class JwtTokenProvider(
             email = email,
             role = role,
         )
+    }
+
+    private fun getTokenType(claims: Claims): TokenType {
+        val type = claims.get("token_type", String::class.java)
+        return TokenType.valueOf(type)
     }
 
     private fun getClaims(token: String): Claims {
