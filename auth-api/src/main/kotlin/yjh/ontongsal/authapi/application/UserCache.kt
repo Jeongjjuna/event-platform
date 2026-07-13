@@ -52,4 +52,8 @@ class UserCache(
         // 3. 캐시 저장 및 반환
         return userCacheRepository.set(email, user)
     }
+
+    fun evict(email: String) {
+        userCacheRepository.evict(email)
+    }
 }

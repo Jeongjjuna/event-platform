@@ -48,4 +48,12 @@ class UserCaffeineCacheRepository(
 
         return cachedUser
     }
+
+    override fun evict(email: String) {
+        try {
+            cache.evict(email)
+        } catch (e: Exception) {
+            log.error(e) { "[UserCache] Failed to evict user data from Caffeine. Ignored. email=$email" }
+        }
+    }
 }

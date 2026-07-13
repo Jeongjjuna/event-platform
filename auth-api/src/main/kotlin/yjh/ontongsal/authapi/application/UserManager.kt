@@ -1,6 +1,7 @@
 package yjh.ontongsal.authapi.application
 
 import org.springframework.stereotype.Component
+import yjh.ontongsal.authapi.domain.ChangePasswordInfo
 import yjh.ontongsal.authapi.domain.LoginInfo
 import yjh.ontongsal.authapi.domain.SignUpInfo
 import yjh.ontongsal.authapi.domain.User
@@ -44,5 +45,25 @@ class UserManager(
             throw AppException.Unauthorized(ErrorCode.LOGIN_FAILED)
         }
         return user
+    }
+
+    fun changePassword(email: String, changePasswordInfo: ChangePasswordInfo) {
+        val user = userReader.read(email)
+
+        if (!credentialEncoder.matches(changePasswordInfo.currentPassword, user.password)) {
+            throw AppException.BadRequest(ErrorCode.INVALID_PASSWORD)
+        }
+
+        val hashedPassword = credentialEncoder.hash(changePasswordInfo.newPassword)
+            ?: throw AppException.BadRequest(ErrorCode.INVALID_PASSWORD)
+
+        userRepository.updatePassword(user.id!!, hashedPassword)
+    }
+
+    fun withdraw(userId: Long) {
+        val deleted = userRepository.softDeleteById(userId)
+        if (deleted == 0) {
+            throw AppException.NotFound(ErrorCode.USER_NOT_FOUND)
+        }
     }
 }

@@ -4,10 +4,7 @@ import jakarta.validation.Valid
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import yjh.ontongsal.authapi.application.LoginService
-import yjh.ontongsal.authapi.application.LogoutService
-import yjh.ontongsal.authapi.application.RefreshService
-import yjh.ontongsal.authapi.application.SignUpService
+import yjh.ontongsal.authapi.application.*
 import yjh.ontongsal.authapi.shared.response.ApiController
 import yjh.ontongsal.authapi.shared.response.ApiResponseEntity
 import yjh.ontongsal.authapi.shared.security.SecurityUserDetails
@@ -19,6 +16,8 @@ class UserController(
     private val loginService: LoginService,
     private val refreshService: RefreshService,
     private val logoutService: LogoutService,
+    private val changePasswordService: ChangePasswordService,
+    private val withdrawService: WithdrawService,
 ) : ApiController {
 
     @PostMapping(value = ["/signup"], version = "v1")
@@ -62,5 +61,29 @@ class UserController(
     ): ApiResponseEntity<MyInfoResponse> {
         val cachedUser = loginService.getMyInfo(principal.userId, principal.username) // username == email
         return ok(MyInfoResponse.from(cachedUser))
+    }
+
+
+    @PreAuthorize("hasAuthority('USER')")
+    @PatchMapping(value = ["/me/password"], version = "v1")
+    fun changePassword(
+        @AuthenticationPrincipal principal: SecurityUserDetails,
+        @Valid @RequestBody changePasswordRequest: ChangePasswordRequest,
+    ): ApiResponseEntity<Unit> {
+        changePasswordService.changePassword(
+            principal.userId,
+            principal.username,
+            changePasswordRequest.toChangePasswordInfo()
+        )
+        return ok()
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @DeleteMapping(value = ["/me"], version = "v1")
+    fun withdraw(
+        @AuthenticationPrincipal principal: SecurityUserDetails,
+    ): ApiResponseEntity<Unit> {
+        withdrawService.withdraw(principal.userId, principal.username)
+        return ok()
     }
 }

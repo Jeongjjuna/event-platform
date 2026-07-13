@@ -55,4 +55,14 @@ class UserRedisCacheRepository(
 
         return CachedUser(user.id!!, user.email, user.role, user.createdAt)
     }
+
+    override fun evict(email: String) {
+        val key = "$KEY_PREFIX$email"
+
+        try {
+            redisTemplate.delete(key)
+        } catch (e: Exception) {
+            log.error(e) { "[UserCache] Failed to evict user data from Redis. Ignored. email=$email" }
+        }
+    }
 }
