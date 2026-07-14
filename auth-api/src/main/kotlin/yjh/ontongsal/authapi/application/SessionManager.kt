@@ -1,12 +1,12 @@
 package yjh.ontongsal.authapi.application
 
 import org.springframework.stereotype.Component
+import yjh.ontongsal.authapi.domain.AuthErrorCode
 import yjh.ontongsal.authapi.domain.JwtToken
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserSession
 import yjh.ontongsal.authapi.infrastructure.UserSessionRepository
 import yjh.ontongsal.authapi.shared.response.AppException
-import yjh.ontongsal.authapi.shared.response.ErrorCode
 
 @Component
 class SessionManager(
@@ -18,7 +18,7 @@ class SessionManager(
 
     fun readSession(userId: Long): UserSession {
         return userSessionRepository.findByUserId(userId)
-            ?: throw AppException.Unauthorized(ErrorCode.NOT_FOUND_SESSION)
+            ?: throw AppException.Unauthorized(AuthErrorCode.NOT_FOUND_SESSION)
     }
 
     fun deleteSession(userId: Long) {

@@ -2,10 +2,10 @@ package yjh.ontongsal.authapi.application
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
+import yjh.ontongsal.authapi.domain.AuthErrorCode
 import yjh.ontongsal.authapi.domain.CachedUser
 import yjh.ontongsal.authapi.infrastructure.UserRepository
 import yjh.ontongsal.authapi.shared.response.AppException
-import yjh.ontongsal.authapi.shared.response.ErrorCode
 
 /**
  * 구현 계층으로, 캐시 전략등을 적용한다.
@@ -49,7 +49,7 @@ class UserCache(
 
         // 2. DB 조회 (Cache Miss)
         val user = userRepository.findByEmail(email)
-            ?: throw AppException.NotFound(ErrorCode.USER_NOT_FOUND)
+            ?: throw AppException.NotFound(AuthErrorCode.USER_NOT_FOUND)
 
         // 3. 캐시 저장 및 반환
         return userCacheRepository.set(email, user)

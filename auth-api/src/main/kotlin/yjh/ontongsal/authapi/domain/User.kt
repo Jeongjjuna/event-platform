@@ -1,5 +1,6 @@
 package yjh.ontongsal.authapi.domain
 
+import yjh.ontongsal.authapi.shared.response.DomainException
 import java.time.Instant
 
 class User(
@@ -36,7 +37,7 @@ class User(
 
     private fun validateActive() {
         if (this.deletedAt != null) {
-            throw IllegalStateException("User is already withdrawn")
+            throw DomainException.InvalidState(AuthErrorCode.USER_ALREADY_WITHDRAWN)
         }
     }
 }

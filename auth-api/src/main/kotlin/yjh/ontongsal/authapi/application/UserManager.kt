@@ -3,12 +3,12 @@ package yjh.ontongsal.authapi.application
 import org.springframework.stereotype.Component
 import yjh.ontongsal.authapi.application.command.ChangePasswordCommand
 import yjh.ontongsal.authapi.application.command.SignUpCommand
+import yjh.ontongsal.authapi.domain.AuthErrorCode
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserRegistration
 import yjh.ontongsal.authapi.domain.UserRole
 import yjh.ontongsal.authapi.infrastructure.UserRepository
 import yjh.ontongsal.authapi.shared.response.AppException
-import yjh.ontongsal.authapi.shared.response.ErrorCode
 import java.time.Instant
 
 @Component
@@ -24,7 +24,7 @@ class UserManager(
     fun validateDuplicateEmail(email: String) {
         val user = userReader.find(email)
         if (user != null) {
-            throw AppException.Conflict(ErrorCode.USER_CONFLICT)
+            throw AppException.Conflict(AuthErrorCode.USER_CONFLICT)
         }
     }
 
@@ -42,7 +42,7 @@ class UserManager(
 
     fun login(user: User, password: String) {
         if (!credentialEncoder.matches(user.password, password)) {
-            throw AppException.Unauthorized(ErrorCode.LOGIN_FAILED)
+            throw AppException.Unauthorized(AuthErrorCode.LOGIN_FAILED)
         }
 
         user.login(Instant.now());
@@ -51,11 +51,10 @@ class UserManager(
 
     fun changePassword(user: User, changePasswordCommand: ChangePasswordCommand) {
         if (!credentialEncoder.matches(changePasswordCommand.currentPassword, user.password)) {
-            throw AppException.BadRequest(ErrorCode.NOT_MATCH_PASSWORD)
+            throw AppException.BadRequest(AuthErrorCode.NOT_MATCH_PASSWORD)
         }
 
         val hashedPassword = credentialEncoder.hash(changePasswordCommand.newPassword)
-            ?: throw AppException.BadRequest(ErrorCode.NOT_MATCH_PASSWORD)
 
         user.changePassword(hashedPassword)
         userRepository.updatePassword(user)

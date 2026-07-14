@@ -1,5 +1,6 @@
 package yjh.ontongsal.authapi.domain
 
+import yjh.ontongsal.authapi.shared.response.DomainException
 import java.time.Instant
 
 class UserSession(
@@ -10,7 +11,7 @@ class UserSession(
 
     fun validateRefreshToken(refreshToken: String) {
         if (this.refreshToken != refreshToken) {
-            throw IllegalArgumentException("Invalid refresh token")
+            throw DomainException.Unauthorized(AuthErrorCode.SESSION_TOKEN_MISMATCH)
         }
     }
 }

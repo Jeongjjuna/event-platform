@@ -1,7 +1,7 @@
 package yjh.ontongsal.authapi.application.command
 
+import yjh.ontongsal.authapi.domain.AuthErrorCode
 import yjh.ontongsal.authapi.shared.response.AppException
-import yjh.ontongsal.authapi.shared.response.ErrorCode
 
 data class ChangePasswordCommand(
     val currentPassword: String,
@@ -9,10 +9,10 @@ data class ChangePasswordCommand(
 ) {
     init {
         require(!PASSWORD_REGEX.matches(currentPassword)) {
-            throw AppException.BadRequest(ErrorCode.INVALID_FORMAT_PASSWORD)
+            throw AppException.BadRequest(AuthErrorCode.INVALID_FORMAT_PASSWORD)
         }
         require(!PASSWORD_REGEX.matches(newPassword)) {
-            throw AppException.BadRequest(ErrorCode.INVALID_FORMAT_PASSWORD)
+            throw AppException.BadRequest(AuthErrorCode.INVALID_FORMAT_PASSWORD)
         }
     }
 

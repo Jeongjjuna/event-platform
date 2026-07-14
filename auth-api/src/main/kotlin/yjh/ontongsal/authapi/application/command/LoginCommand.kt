@@ -1,7 +1,7 @@
 package yjh.ontongsal.authapi.application.command
 
+import yjh.ontongsal.authapi.domain.AuthErrorCode
 import yjh.ontongsal.authapi.shared.response.AppException
-import yjh.ontongsal.authapi.shared.response.ErrorCode
 
 data class LoginCommand(
     val email: String,
@@ -9,10 +9,10 @@ data class LoginCommand(
 ) {
     init {
         require(!EMAIL_REGEX.matches(email)) {
-            throw AppException.BadRequest(ErrorCode.INVALID_FORMAT_EMAIL)
+            throw AppException.BadRequest(AuthErrorCode.INVALID_FORMAT_EMAIL)
         }
         require(!PASSWORD_REGEX.matches(password)) {
-            throw AppException.BadRequest(ErrorCode.INVALID_FORMAT_PASSWORD)
+            throw AppException.BadRequest(AuthErrorCode.INVALID_FORMAT_PASSWORD)
         }
     }
 
