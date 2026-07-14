@@ -34,7 +34,7 @@ class UserCaffeineCacheRepository(
 
     override fun set(email: String, user: User): CachedUser {
         val cachedUser = CachedUser(
-            id = user.id!!,
+            id = user.id,
             email = user.email,
             role = user.role,
             createdAt = user.createdAt

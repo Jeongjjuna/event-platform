@@ -45,7 +45,7 @@ class UserRedisCacheRepository(
 
         try {
             val dto =
-                UserCacheDto(id = user.id!!, email = user.email, role = user.role.name, createdAt = user.createdAt)
+                UserCacheDto(id = user.id, email = user.email, role = user.role.name, createdAt = user.createdAt)
 
             val jsonString = objectMapper.writeValueAsString(dto)
             redisTemplate.opsForValue().set(key, jsonString, CACHE_TYPE.globalTtl)
@@ -53,7 +53,7 @@ class UserRedisCacheRepository(
             log.error(e) { "[UserCache] Failed to set user data to Redis. Ignored. email=$email" }
         }
 
-        return CachedUser(user.id!!, user.email, user.role, user.createdAt)
+        return CachedUser(user.id, user.email, user.role, user.createdAt)
     }
 
     override fun evict(email: String) {

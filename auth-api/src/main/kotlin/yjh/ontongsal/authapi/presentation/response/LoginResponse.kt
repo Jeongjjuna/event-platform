@@ -22,7 +22,7 @@ data class LoginResponse(
             accessToken = loginResult.jwtToken.accessToken,
             refreshToken = loginResult.jwtToken.refreshToken,
             user = UserResponse(
-                id = loginResult.user.id!!,
+                id = loginResult.user.id,
                 email = loginResult.user.email,
                 role = loginResult.user.role,
                 registeredAt = loginResult.user.createdAt
