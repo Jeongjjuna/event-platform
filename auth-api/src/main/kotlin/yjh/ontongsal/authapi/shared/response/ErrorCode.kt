@@ -15,4 +15,6 @@ enum class ErrorCode(
     // Auth (2000~2099)
     INVALID_TOKEN_TYPE(2000, "토큰 타입이 유효하지 않습니다."),
     NOT_FOUND_SESSION(2001, "세션이 존재하지 않습니다."),
+
+    INTERNAL_SERVER_ERROR(9999, "내부 서버 오류가 발생했습니다."),
 }

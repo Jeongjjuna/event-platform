@@ -30,7 +30,6 @@ class UserManager(
 
     fun register(signUpCommand: SignUpCommand) {
         val hashedPassword = credentialEncoder.hash(signUpCommand.password)
-            ?: throw AppException.BadRequest(ErrorCode.NOT_MATCH_PASSWORD)
 
         val userRegistration = UserRegistration.of(
             email = signUpCommand.email,
