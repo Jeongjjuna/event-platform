@@ -1,22 +1,18 @@
 package yjh.ontongsal.authapi.presentation.request
 
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Pattern
-import yjh.ontongsal.authapi.domain.ChangePasswordInfo
+import yjh.ontongsal.authapi.application.command.ChangePasswordCommand
 
 data class ChangePasswordRequest(
-    @field:NotBlank(message = "현재 비밀번호를 입력해주세요.")
+    @field:NotBlank(message = "현재 비밀번호는 필수 입력 항목입니다.")
     val currentPassword: String,
 
-    @field:Pattern(
-        regexp = "^(?=.*[A-Za-z])(?=.*\\d).{8,}$",
-        message = "비밀번호는 영문자와 숫자를 포함한 8자리 이상이어야 합니다."
-    )
+    @field:NotBlank(message = "신규 비밀번호는 필수 입력 항목입니다.")
     val newPassword: String,
 ) {
 
-    fun toChangePasswordInfo(): ChangePasswordInfo {
-        return ChangePasswordInfo(currentPassword, newPassword)
+    fun toCommand(): ChangePasswordCommand {
+        return ChangePasswordCommand(currentPassword, newPassword)
     }
 }
 

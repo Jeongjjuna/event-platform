@@ -1,12 +1,11 @@
 package yjh.ontongsal.authapi.application
 
 import org.springframework.stereotype.Component
+import yjh.ontongsal.authapi.application.command.ChangePasswordCommand
 import yjh.ontongsal.authapi.application.command.SignUpCommand
-import yjh.ontongsal.authapi.domain.ChangePasswordInfo
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserRegistration
 import yjh.ontongsal.authapi.domain.UserRole
-import yjh.ontongsal.authapi.infrastructure.UserSessionRepository
 import yjh.ontongsal.authapi.infrastructure.UserRepository
 import yjh.ontongsal.authapi.shared.response.AppException
 import yjh.ontongsal.authapi.shared.response.ErrorCode
@@ -17,11 +16,9 @@ class UserManager(
     // implement layer
     private val userReader: UserReader,
     private val credentialEncoder: CredentialEncoder,
-    private val tokenManager: TokenManager,
 
     // infrastructure layer
     private val userRepository: UserRepository,
-    private val userSessionRepository: UserSessionRepository,
 ) {
 
     fun validateDuplicateEmail(email: String) {
@@ -53,26 +50,19 @@ class UserManager(
         userRepository.updateLoginTime(user)
     }
 
-    fun changePassword(email: String, changePasswordInfo: ChangePasswordInfo) {
-        val user = userReader.read(email)
-
-        if (!credentialEncoder.matches(changePasswordInfo.currentPassword, user.password)) {
+    fun changePassword(user: User, changePasswordCommand: ChangePasswordCommand) {
+        if (!credentialEncoder.matches(changePasswordCommand.currentPassword, user.password)) {
             throw AppException.BadRequest(ErrorCode.NOT_MATCH_PASSWORD)
         }
 
-        val hashedPassword = credentialEncoder.hash(changePasswordInfo.newPassword)
+        val hashedPassword = credentialEncoder.hash(changePasswordCommand.newPassword)
             ?: throw AppException.BadRequest(ErrorCode.NOT_MATCH_PASSWORD)
 
         user.changePassword(hashedPassword)
         userRepository.updatePassword(user)
     }
 
-    fun withdraw(email: String) {
-        val user = userReader.read(email)
-        user.withdraw()
-        val deleted = userRepository.softDelete(user)
-        if (deleted == 0) {
-            throw AppException.NotFound(ErrorCode.USER_NOT_FOUND)
-        }
+    fun withdraw(user: User) {
+        userRepository.delete(user)
     }
 }

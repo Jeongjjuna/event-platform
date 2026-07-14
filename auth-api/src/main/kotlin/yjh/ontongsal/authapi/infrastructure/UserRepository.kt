@@ -56,15 +56,15 @@ class UserRepository(
 
     fun updatePassword(user: User): Int = transaction.run {
         UserTable
-            .update({ (UserTable.id eq user.id!!) and UserTable.deletedAt.isNull() }) {
+            .update({ (UserTable.id eq user.id) }) {
                 it[UserTable.password] = user.password
                 it[UserTable.updatedAt] = user.updatedAt
             }
     }
 
-    fun softDelete(user: User): Int = transaction.run {
+    fun delete(user: User): Int = transaction.run {
         UserTable
-            .update({ (UserTable.id eq user.id!!) and UserTable.deletedAt.isNull() }) {
+            .update({ (UserTable.id eq user.id) }) {
                 it[UserTable.deletedAt] = user.deletedAt
                 it[UserTable.updatedAt] = user.updatedAt
             }

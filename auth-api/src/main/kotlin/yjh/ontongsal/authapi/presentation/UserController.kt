@@ -62,26 +62,12 @@ class UserController(
     }
 
     @PreAuthorize("hasAuthority('USER')")
-    @GetMapping(value = ["/me"], version = "v1")
-    fun getMyInfo(
-        @AuthenticationPrincipal principal: SecurityUserDetails,
-    ): ApiResponseEntity<MyInfoResponse> {
-        val cachedUser = loginService.getMyInfo(principal.userId, principal.username) // username == email
-        return ok(MyInfoResponse.from(cachedUser))
-    }
-
-
-    @PreAuthorize("hasAuthority('USER')")
     @PatchMapping(value = ["/me/password"], version = "v1")
     fun changePassword(
         @AuthenticationPrincipal principal: SecurityUserDetails,
         @Valid @RequestBody changePasswordRequest: ChangePasswordRequest,
     ): ApiResponseEntity<Unit> {
-        changePasswordService.changePassword(
-            principal.userId,
-            principal.username,
-            changePasswordRequest.toChangePasswordInfo()
-        )
+        changePasswordService.changePassword(principal.userId, principal.username, changePasswordRequest.toCommand())
         return ok()
     }
 
@@ -92,5 +78,14 @@ class UserController(
     ): ApiResponseEntity<Unit> {
         withdrawService.withdraw(principal.userId, principal.username)
         return ok()
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping(value = ["/me"], version = "v1")
+    fun getMyInfo(
+        @AuthenticationPrincipal principal: SecurityUserDetails,
+    ): ApiResponseEntity<MyInfoResponse> {
+        val cachedUser = loginService.getMyInfo(principal.userId, principal.username) // username == email
+        return ok(MyInfoResponse.from(cachedUser))
     }
 }

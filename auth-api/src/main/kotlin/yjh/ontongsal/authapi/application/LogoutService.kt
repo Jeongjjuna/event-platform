@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class LogoutService(
-    private val tokenManager: TokenManager
+    private val sessionManager: SessionManager,
 ) {
 
     fun logout(userId: Long) {
-        tokenManager.deleteRefreshToken(userId)
+        sessionManager.deleteSession(userId)
     }
 }

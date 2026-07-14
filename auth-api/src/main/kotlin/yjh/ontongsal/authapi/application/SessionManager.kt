@@ -20,4 +20,8 @@ class SessionManager(
         return userSessionRepository.findByUserId(userId)
             ?: throw AppException.Unauthorized(ErrorCode.NOT_FOUND_SESSION)
     }
+
+    fun deleteSession(userId: Long) {
+        userSessionRepository.deleteByUserId(userId)
+    }
 }

@@ -3,7 +3,6 @@ package yjh.ontongsal.authapi.application
 import org.springframework.stereotype.Component
 import yjh.ontongsal.authapi.domain.JwtToken
 import yjh.ontongsal.authapi.domain.User
-import yjh.ontongsal.authapi.infrastructure.UserSessionRepository
 import yjh.ontongsal.authapi.shared.response.AppException
 import yjh.ontongsal.authapi.shared.response.ErrorCode
 import yjh.ontongsal.authapi.shared.security.jwt.JwtTokenProvider
@@ -13,7 +12,6 @@ import yjh.ontongsal.authapi.shared.security.jwt.TokenType
 @Component
 class TokenManager(
     private val jwtTokenProvider: JwtTokenProvider,
-    private val userSessionRepository: UserSessionRepository,
 ) {
     fun issue(user: User): JwtToken {
         val accessToken = jwtTokenProvider.issueAccessToken(user)
@@ -31,9 +29,5 @@ class TokenManager(
             throw AppException.Unauthorized(ErrorCode.INVALID_TOKEN_TYPE)
         }
         return jwtTokenProvider.getUserInfo(token)
-    }
-
-    fun deleteRefreshToken(userId: Long) {
-        userSessionRepository.deleteByUserId(userId)
     }
 }

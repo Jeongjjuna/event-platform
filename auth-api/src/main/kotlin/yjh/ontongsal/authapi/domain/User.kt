@@ -13,21 +13,30 @@ class User(
     var deletedAt: Instant?,
 ) {
     fun changePassword(hashedPassword: String) {
+        validateActive()
+
         this.password = hashedPassword
         this.updatedAt = Instant.now()
     }
 
     fun withdraw() {
+        validateActive()
+
         val now = Instant.now()
         this.updatedAt = now
         this.deletedAt = now
     }
 
     fun login(now: Instant) {
+        validateActive()
+
+        this.lastLoginAt = now
+        this.updatedAt = now
+    }
+
+    private fun validateActive() {
         if (this.deletedAt != null) {
             throw IllegalStateException("User is already withdrawn")
         }
-        this.lastLoginAt = now
-        this.updatedAt = now
     }
 }
