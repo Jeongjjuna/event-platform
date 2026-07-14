@@ -8,6 +8,7 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.update
 import org.springframework.stereotype.Repository
 import yjh.ontongsal.authapi.domain.User
+import yjh.ontongsal.authapi.domain.UserRegistration
 import yjh.ontongsal.authapi.domain.UserRole
 import yjh.ontongsal.authapi.shared.persistence.TransactionRunner
 
@@ -15,14 +16,14 @@ import yjh.ontongsal.authapi.shared.persistence.TransactionRunner
 class UserRepository(
     private val transaction: TransactionRunner
 ) {
-    fun save(user: User) = transaction.run {
+    fun save(userRegistration: UserRegistration) = transaction.run {
         UserTable.insert {
-            it[email] = user.email
-            it[password] = user.password
-            it[userRole] = user.role.name
-            it[createdAt] = user.createdAt
-            it[updatedAt] = user.updatedAt
-            it[deletedAt] = user.deletedAt
+            it[email] = userRegistration.email
+            it[password] = userRegistration.password
+            it[userRole] = userRegistration.role.name
+            it[createdAt] = userRegistration.createdAt
+            it[updatedAt] = userRegistration.updatedAt
+            it[deletedAt] = userRegistration.deletedAt
         }
     }
 

@@ -31,7 +31,7 @@ class UserController(
     fun signUp(
         @Valid @RequestBody signUpRequest: SignUpRequest
     ): ApiResponseEntity<Unit> {
-        signUpService.signUp(signUpRequest.toSignUpInfo())
+        signUpService.signUp(signUpRequest.toCommand())
         return ok()
     }
 

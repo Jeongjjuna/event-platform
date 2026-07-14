@@ -1,13 +1,16 @@
 package yjh.ontongsal.authapi.application
 
 import org.springframework.stereotype.Component
+import yjh.ontongsal.authapi.application.command.SignUpCommand
 import yjh.ontongsal.authapi.domain.ChangePasswordInfo
 import yjh.ontongsal.authapi.domain.LoginInfo
-import yjh.ontongsal.authapi.domain.SignUpInfo
 import yjh.ontongsal.authapi.domain.User
+import yjh.ontongsal.authapi.domain.UserRegistration
+import yjh.ontongsal.authapi.domain.UserRole
 import yjh.ontongsal.authapi.infrastructure.UserRepository
 import yjh.ontongsal.authapi.shared.response.AppException
 import yjh.ontongsal.authapi.shared.response.ErrorCode
+import java.time.Instant
 
 @Component
 class UserManager(
@@ -19,22 +22,24 @@ class UserManager(
     private val userRepository: UserRepository
 ) {
 
-    fun checkAlreadyRegistered(email: String) {
+    fun validateDuplicateEmail(email: String) {
         val user = userReader.find(email)
         if (user != null) {
             throw AppException.Conflict(ErrorCode.USER_CONFLICT)
         }
     }
 
-    fun signUp(signUpInfo: SignUpInfo) {
-        val hashedPassword = credentialEncoder.hash(signUpInfo.password)
-            ?: throw AppException.BadRequest(ErrorCode.INVALID_PASSWORD)
+    fun register(signUpCommand: SignUpCommand) {
+        val hashedPassword = credentialEncoder.hash(signUpCommand.password)
+            ?: throw AppException.BadRequest(ErrorCode.NOT_MATCH_PASSWORD)
 
-        val user = User.signUp(
-            email = signUpInfo.email,
-            password = hashedPassword
+        val userRegistration = UserRegistration.of(
+            email = signUpCommand.email,
+            password = hashedPassword,
+            role = UserRole.USER,
+            now = Instant.now()
         )
-        userRepository.save(user)
+        userRepository.save(userRegistration)
     }
 
     fun authenticate(loginInfo: LoginInfo): User {
@@ -51,11 +56,11 @@ class UserManager(
         val user = userReader.read(email)
 
         if (!credentialEncoder.matches(changePasswordInfo.currentPassword, user.password)) {
-            throw AppException.BadRequest(ErrorCode.INVALID_PASSWORD)
+            throw AppException.BadRequest(ErrorCode.NOT_MATCH_PASSWORD)
         }
 
         val hashedPassword = credentialEncoder.hash(changePasswordInfo.newPassword)
-            ?: throw AppException.BadRequest(ErrorCode.INVALID_PASSWORD)
+            ?: throw AppException.BadRequest(ErrorCode.NOT_MATCH_PASSWORD)
 
         user.changePassword(hashedPassword)
         userRepository.updatePassword(user)
