@@ -21,6 +21,7 @@ class UserRepository(
             it[email] = userRegistration.email
             it[password] = userRegistration.password
             it[userRole] = userRegistration.role.name
+            it[lastLoginAt] = userRegistration.lastLoginAt
             it[createdAt] = userRegistration.createdAt
             it[updatedAt] = userRegistration.updatedAt
             it[deletedAt] = userRegistration.deletedAt
@@ -38,10 +39,18 @@ class UserRepository(
                     email = it[UserTable.email],
                     password = it[UserTable.password],
                     role = UserRole.valueOf(it[UserTable.userRole]),
+                    lastLoginAt = it[UserTable.lastLoginAt],
                     createdAt = it[UserTable.createdAt],
                     updatedAt = it[UserTable.updatedAt],
                     deletedAt = it[UserTable.deletedAt],
                 )
+            }
+    }
+
+    fun updateLoginTime(user: User) = transaction.run {
+        UserTable
+            .update({ (UserTable.id eq user.id) }) {
+                it[UserTable.lastLoginAt] = user.lastLoginAt
             }
     }
 

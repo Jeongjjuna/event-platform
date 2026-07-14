@@ -39,7 +39,7 @@ class UserController(
     fun login(
         @Valid @RequestBody loginRequest: LoginRequest
     ): ApiResponseEntity<LoginResponse> {
-        val loginResult = loginService.login(loginRequest.toLoginInfo())
+        val loginResult = loginService.login(loginRequest.toCommand())
         return ok(LoginResponse.from(loginResult))
     }
 
@@ -47,8 +47,8 @@ class UserController(
     fun refresh(
         @Valid @RequestBody refreshRequest: RefreshRequest
     ): ApiResponseEntity<RefreshResponse> {
-        val (accessToken, refreshToken) = refreshService.refreshToken(refreshRequest.refreshToken)
-        return ok(RefreshResponse.from(accessToken, refreshToken))
+        val jwtToken = refreshService.refreshToken(refreshRequest.refreshToken)
+        return ok(RefreshResponse.from(jwtToken))
     }
 
 

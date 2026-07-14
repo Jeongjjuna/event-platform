@@ -1,6 +1,7 @@
 package yjh.ontongsal.authapi.domain
 
-data class IssuedToken(
+data class JwtToken(
+    val grantType: String,
     val accessToken: String,
     val refreshToken: String,
 )

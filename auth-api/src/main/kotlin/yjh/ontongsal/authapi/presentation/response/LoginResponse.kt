@@ -19,8 +19,8 @@ data class LoginResponse(
 
     companion object {
         fun from(loginResult: LoginResult) = LoginResponse(
-            accessToken = loginResult.accessToken,
-            refreshToken = loginResult.refreshToken,
+            accessToken = loginResult.jwtToken.accessToken,
+            refreshToken = loginResult.jwtToken.refreshToken,
             user = UserResponse(
                 id = loginResult.user.id!!,
                 email = loginResult.user.email,

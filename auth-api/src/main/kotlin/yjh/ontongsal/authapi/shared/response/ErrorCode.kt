@@ -13,6 +13,6 @@ enum class ErrorCode(
     INVALID_FORMAT_PASSWORD(1005, "유효하지 않은 형식의 비밀번호 입니다."),
 
     // Auth (2000~2099)
-    INVALID_ACCESS_TOKEN(2000, "Access Token 이 유효하지 않습니다."),
-    INVALID_REFRESH_TOKEN(2001, "Refresh Token 이 유효하지 않습니다.")
+    INVALID_TOKEN_TYPE(2000, "토큰 타입이 유효하지 않습니다."),
+    NOT_FOUND_SESSION(2001, "세션이 존재하지 않습니다."),
 }

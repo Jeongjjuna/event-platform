@@ -3,10 +3,10 @@ package yjh.ontongsal.authapi.application
 import org.springframework.stereotype.Component
 import yjh.ontongsal.authapi.application.command.SignUpCommand
 import yjh.ontongsal.authapi.domain.ChangePasswordInfo
-import yjh.ontongsal.authapi.domain.LoginInfo
 import yjh.ontongsal.authapi.domain.User
 import yjh.ontongsal.authapi.domain.UserRegistration
 import yjh.ontongsal.authapi.domain.UserRole
+import yjh.ontongsal.authapi.infrastructure.UserSessionRepository
 import yjh.ontongsal.authapi.infrastructure.UserRepository
 import yjh.ontongsal.authapi.shared.response.AppException
 import yjh.ontongsal.authapi.shared.response.ErrorCode
@@ -17,9 +17,11 @@ class UserManager(
     // implement layer
     private val userReader: UserReader,
     private val credentialEncoder: CredentialEncoder,
+    private val tokenManager: TokenManager,
 
     // infrastructure layer
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val userSessionRepository: UserSessionRepository,
 ) {
 
     fun validateDuplicateEmail(email: String) {
@@ -42,14 +44,13 @@ class UserManager(
         userRepository.save(userRegistration)
     }
 
-    fun authenticate(loginInfo: LoginInfo): User {
-        val user = userReader.find(loginInfo.email)
-            ?: throw AppException.Unauthorized(ErrorCode.LOGIN_FAILED)
-
-        if (!credentialEncoder.matches(loginInfo.password, user.password)) {
+    fun login(user: User, password: String) {
+        if (!credentialEncoder.matches(user.password, password)) {
             throw AppException.Unauthorized(ErrorCode.LOGIN_FAILED)
         }
-        return user
+
+        user.login(Instant.now());
+        userRepository.updateLoginTime(user)
     }
 
     fun changePassword(email: String, changePasswordInfo: ChangePasswordInfo) {
