@@ -1,4 +1,4 @@
-package yjh.ontongsal.authapi.presentation
+package yjh.ontongsal.authapi.presentation.response
 
 data class RefreshResponse(
     val accessToken: String,

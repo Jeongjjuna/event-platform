@@ -5,6 +5,13 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import yjh.ontongsal.authapi.application.*
+import yjh.ontongsal.authapi.presentation.request.ChangePasswordRequest
+import yjh.ontongsal.authapi.presentation.request.LoginRequest
+import yjh.ontongsal.authapi.presentation.request.RefreshRequest
+import yjh.ontongsal.authapi.presentation.request.SignUpRequest
+import yjh.ontongsal.authapi.presentation.response.LoginResponse
+import yjh.ontongsal.authapi.presentation.response.MyInfoResponse
+import yjh.ontongsal.authapi.presentation.response.RefreshResponse
 import yjh.ontongsal.authapi.shared.response.ApiController
 import yjh.ontongsal.authapi.shared.response.ApiResponseEntity
 import yjh.ontongsal.authapi.shared.security.SecurityUserDetails

@@ -1,4 +1,4 @@
-package yjh.ontongsal.authapi.presentation
+package yjh.ontongsal.authapi.presentation.request
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern

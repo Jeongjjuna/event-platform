@@ -1,4 +1,4 @@
-package yjh.ontongsal.authapi.presentation
+package yjh.ontongsal.authapi.presentation.response
 
 import yjh.ontongsal.authapi.domain.CachedUser
 import yjh.ontongsal.authapi.domain.User
