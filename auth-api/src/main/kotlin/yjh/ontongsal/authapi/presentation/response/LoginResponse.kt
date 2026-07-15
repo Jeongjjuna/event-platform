@@ -1,4 +1,4 @@
-package yjh.ontongsal.authapi.presentation
+package yjh.ontongsal.authapi.presentation.response
 
 import yjh.ontongsal.authapi.domain.LoginResult
 import yjh.ontongsal.authapi.domain.UserRole
@@ -19,10 +19,10 @@ data class LoginResponse(
 
     companion object {
         fun from(loginResult: LoginResult) = LoginResponse(
-            accessToken = loginResult.accessToken,
-            refreshToken = loginResult.refreshToken,
+            accessToken = loginResult.jwtToken.accessToken,
+            refreshToken = loginResult.jwtToken.refreshToken,
             user = UserResponse(
-                id = loginResult.user.id!!,
+                id = loginResult.user.id,
                 email = loginResult.user.email,
                 role = loginResult.user.role,
                 registeredAt = loginResult.user.createdAt

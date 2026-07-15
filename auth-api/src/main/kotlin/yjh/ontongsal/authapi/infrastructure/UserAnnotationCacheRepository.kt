@@ -37,7 +37,7 @@ class UserAnnotationCacheRepository : UserCacheRepository {
     @CachePut(cacheNames = [CacheType.Name.USER_INFO], cacheManager = CACHE_MANAGER, key = "#email")
     override fun set(email: String, user: User): CachedUser =
         CachedUser(
-            id = user.id!!,
+            id = user.id,
             email = user.email,
             role = user.role,
             createdAt = user.createdAt

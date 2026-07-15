@@ -1,38 +1,43 @@
 package yjh.ontongsal.authapi.domain
 
+import yjh.ontongsal.authapi.shared.response.DomainException
 import java.time.Instant
 
 class User(
-    val id: Long?,
+    val id: Long,
     val email: String,
     var password: String,
     val role: UserRole,
+    var lastLoginAt: Instant?,
     val createdAt: Instant,
     var updatedAt: Instant,
     var deletedAt: Instant?,
 ) {
     fun changePassword(hashedPassword: String) {
+        validateActive()
+
         this.password = hashedPassword
         this.updatedAt = Instant.now()
     }
 
     fun withdraw() {
+        validateActive()
+
         val now = Instant.now()
         this.updatedAt = now
         this.deletedAt = now
     }
 
-    companion object {
-        fun signUp(email: String, password: String): User {
-            return User(
-                id = null,
-                email = email,
-                password = password,
-                role = UserRole.USER,
-                createdAt = Instant.now(),
-                updatedAt = Instant.now(),
-                deletedAt = null,
-            )
+    fun login(now: Instant) {
+        validateActive()
+
+        this.lastLoginAt = now
+        this.updatedAt = now
+    }
+
+    private fun validateActive() {
+        if (this.deletedAt != null) {
+            throw DomainException.InvalidState(AuthErrorCode.USER_ALREADY_WITHDRAWN)
         }
     }
 }

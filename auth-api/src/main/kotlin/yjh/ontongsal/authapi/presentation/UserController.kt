@@ -5,6 +5,13 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import yjh.ontongsal.authapi.application.*
+import yjh.ontongsal.authapi.presentation.request.ChangePasswordRequest
+import yjh.ontongsal.authapi.presentation.request.LoginRequest
+import yjh.ontongsal.authapi.presentation.request.RefreshRequest
+import yjh.ontongsal.authapi.presentation.request.SignUpRequest
+import yjh.ontongsal.authapi.presentation.response.LoginResponse
+import yjh.ontongsal.authapi.presentation.response.MyInfoResponse
+import yjh.ontongsal.authapi.presentation.response.RefreshResponse
 import yjh.ontongsal.authapi.shared.response.ApiController
 import yjh.ontongsal.authapi.shared.response.ApiResponseEntity
 import yjh.ontongsal.authapi.shared.security.SecurityUserDetails
@@ -24,7 +31,7 @@ class UserController(
     fun signUp(
         @Valid @RequestBody signUpRequest: SignUpRequest
     ): ApiResponseEntity<Unit> {
-        signUpService.signUp(signUpRequest.toSignUpInfo())
+        signUpService.signUp(signUpRequest.toCommand())
         return ok()
     }
 
@@ -32,7 +39,7 @@ class UserController(
     fun login(
         @Valid @RequestBody loginRequest: LoginRequest
     ): ApiResponseEntity<LoginResponse> {
-        val loginResult = loginService.login(loginRequest.toLoginInfo())
+        val loginResult = loginService.login(loginRequest.toCommand())
         return ok(LoginResponse.from(loginResult))
     }
 
@@ -40,8 +47,8 @@ class UserController(
     fun refresh(
         @Valid @RequestBody refreshRequest: RefreshRequest
     ): ApiResponseEntity<RefreshResponse> {
-        val (accessToken, refreshToken) = refreshService.refreshToken(refreshRequest.refreshToken)
-        return ok(RefreshResponse.from(accessToken, refreshToken))
+        val jwtToken = refreshService.refreshToken(refreshRequest.refreshToken)
+        return ok(RefreshResponse.from(jwtToken))
     }
 
 
@@ -55,26 +62,12 @@ class UserController(
     }
 
     @PreAuthorize("hasAuthority('USER')")
-    @GetMapping(value = ["/me"], version = "v1")
-    fun getMyInfo(
-        @AuthenticationPrincipal principal: SecurityUserDetails,
-    ): ApiResponseEntity<MyInfoResponse> {
-        val cachedUser = loginService.getMyInfo(principal.userId, principal.username) // username == email
-        return ok(MyInfoResponse.from(cachedUser))
-    }
-
-
-    @PreAuthorize("hasAuthority('USER')")
     @PatchMapping(value = ["/me/password"], version = "v1")
     fun changePassword(
         @AuthenticationPrincipal principal: SecurityUserDetails,
         @Valid @RequestBody changePasswordRequest: ChangePasswordRequest,
     ): ApiResponseEntity<Unit> {
-        changePasswordService.changePassword(
-            principal.userId,
-            principal.username,
-            changePasswordRequest.toChangePasswordInfo()
-        )
+        changePasswordService.changePassword(principal.userId, principal.username, changePasswordRequest.toCommand())
         return ok()
     }
 
@@ -85,5 +78,14 @@ class UserController(
     ): ApiResponseEntity<Unit> {
         withdrawService.withdraw(principal.userId, principal.username)
         return ok()
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping(value = ["/me"], version = "v1")
+    fun getMyInfo(
+        @AuthenticationPrincipal principal: SecurityUserDetails,
+    ): ApiResponseEntity<MyInfoResponse> {
+        val cachedUser = loginService.getMyInfo(principal.userId, principal.username) // username == email
+        return ok(MyInfoResponse.from(cachedUser))
     }
 }

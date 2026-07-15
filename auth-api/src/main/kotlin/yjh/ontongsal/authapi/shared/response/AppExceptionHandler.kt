@@ -21,6 +21,29 @@ private val log = KotlinLogging.logger {}
 @RestControllerAdvice
 class AppExceptionHandler {
 
+    @ExceptionHandler(DomainException::class)
+    fun handleDomainException(
+        e: DomainException
+    ): ResponseEntity<ErrorResponse> {
+
+        val status = when (e) {
+            is DomainException.InvalidState -> HttpStatus.BAD_REQUEST
+            is DomainException.Conflict -> HttpStatus.CONFLICT
+            is DomainException.RuleViolation -> HttpStatus.BAD_REQUEST
+            is DomainException.NotFound -> HttpStatus.NOT_FOUND
+            is DomainException.Unauthorized -> HttpStatus.UNAUTHORIZED
+        }
+
+        return ResponseEntity
+            .status(status)
+            .body(
+                ErrorResponse(
+                    code = e.code,
+                    message = e.message ?: "Unknown error message",
+                )
+            )
+    }
+
     /**
      * 5xx(AppException.Internal): 서버 결함이므로 스택트레이스를 포함해 error로 남긴다.
      * 내부 상세가 외부로 노출되지 않도록 응답 message는 일반 문구로 마스킹하고, 원인은 서버 로그에만 기록한다.

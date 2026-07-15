@@ -8,6 +8,7 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.update
 import org.springframework.stereotype.Repository
 import yjh.ontongsal.authapi.domain.User
+import yjh.ontongsal.authapi.domain.UserRegistration
 import yjh.ontongsal.authapi.domain.UserRole
 import yjh.ontongsal.authapi.shared.persistence.TransactionRunner
 
@@ -15,14 +16,15 @@ import yjh.ontongsal.authapi.shared.persistence.TransactionRunner
 class UserRepository(
     private val transaction: TransactionRunner
 ) {
-    fun save(user: User) = transaction.run {
+    fun save(userRegistration: UserRegistration) = transaction.run {
         UserTable.insert {
-            it[email] = user.email
-            it[password] = user.password
-            it[userRole] = user.role.name
-            it[createdAt] = user.createdAt
-            it[updatedAt] = user.updatedAt
-            it[deletedAt] = user.deletedAt
+            it[email] = userRegistration.email
+            it[password] = userRegistration.password
+            it[userRole] = userRegistration.role.name
+            it[lastLoginAt] = userRegistration.lastLoginAt
+            it[createdAt] = userRegistration.createdAt
+            it[updatedAt] = userRegistration.updatedAt
+            it[deletedAt] = userRegistration.deletedAt
         }
     }
 
@@ -37,6 +39,7 @@ class UserRepository(
                     email = it[UserTable.email],
                     password = it[UserTable.password],
                     role = UserRole.valueOf(it[UserTable.userRole]),
+                    lastLoginAt = it[UserTable.lastLoginAt],
                     createdAt = it[UserTable.createdAt],
                     updatedAt = it[UserTable.updatedAt],
                     deletedAt = it[UserTable.deletedAt],
@@ -44,17 +47,24 @@ class UserRepository(
             }
     }
 
+    fun updateLoginTime(user: User) = transaction.run {
+        UserTable
+            .update({ (UserTable.id eq user.id) }) {
+                it[UserTable.lastLoginAt] = user.lastLoginAt
+            }
+    }
+
     fun updatePassword(user: User): Int = transaction.run {
         UserTable
-            .update({ (UserTable.id eq user.id!!) and UserTable.deletedAt.isNull() }) {
+            .update({ (UserTable.id eq user.id) }) {
                 it[UserTable.password] = user.password
                 it[UserTable.updatedAt] = user.updatedAt
             }
     }
 
-    fun softDelete(user: User): Int = transaction.run {
+    fun delete(user: User): Int = transaction.run {
         UserTable
-            .update({ (UserTable.id eq user.id!!) and UserTable.deletedAt.isNull() }) {
+            .update({ (UserTable.id eq user.id) }) {
                 it[UserTable.deletedAt] = user.deletedAt
                 it[UserTable.updatedAt] = user.updatedAt
             }
