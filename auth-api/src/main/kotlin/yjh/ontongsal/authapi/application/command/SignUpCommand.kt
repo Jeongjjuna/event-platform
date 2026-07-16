@@ -8,10 +8,10 @@ data class SignUpCommand(
     val password: String,
 ) {
     init {
-        require(!EMAIL_REGEX.matches(email)) {
+        require(EMAIL_REGEX.matches(email)) {
             throw AppException.BadRequest(AuthErrorCode.INVALID_FORMAT_EMAIL)
         }
-        require(!PASSWORD_REGEX.matches(password)) {
+        require(PASSWORD_REGEX.matches(password)) {
             throw AppException.BadRequest(AuthErrorCode.INVALID_FORMAT_PASSWORD)
         }
     }

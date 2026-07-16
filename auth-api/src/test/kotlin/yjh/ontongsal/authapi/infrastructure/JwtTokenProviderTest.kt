@@ -133,6 +133,7 @@ class JwtTokenProviderTest @Autowired constructor(
             email = "test@example.com",
             password = "encodedPassword123!",
             role = UserRole.USER,
+            lastLoginAt = Instant.now(),
             createdAt = Instant.now(),
             updatedAt = Instant.now(),
             deletedAt = null
