@@ -8,10 +8,10 @@ data class ChangePasswordCommand(
     val newPassword: String,
 ) {
     init {
-        require(!PASSWORD_REGEX.matches(currentPassword)) {
+        require(PASSWORD_REGEX.matches(currentPassword)) {
             throw AppException.BadRequest(AuthErrorCode.INVALID_FORMAT_PASSWORD)
         }
-        require(!PASSWORD_REGEX.matches(newPassword)) {
+        require(PASSWORD_REGEX.matches(newPassword)) {
             throw AppException.BadRequest(AuthErrorCode.INVALID_FORMAT_PASSWORD)
         }
     }

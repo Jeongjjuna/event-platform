@@ -41,8 +41,8 @@ class UserManager(
     }
 
     fun login(user: User, password: String) {
-        if (!credentialEncoder.matches(user.password, password)) {
-            throw AppException.Unauthorized(AuthErrorCode.LOGIN_FAILED)
+        if (!credentialEncoder.matches(password, user.password)) {
+            throw AppException.Unauthorized(AuthErrorCode.NOT_MATCH_PASSWORD)
         }
 
         user.login(Instant.now());
