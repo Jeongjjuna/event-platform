@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <title>API Specification</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 32px;
+        }
+
+        .scenario {
+            background: #f8f8f8;
+            padding: 16px;
+            margin-top: 16px;
+            border-radius: 8px;
+        }
+
+        pre {
+            background: white;
+            padding: 12px;
+            overflow: auto;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<h1>🚀 API Specification</h1>
+
+<div id="app"></div>
+
+
+<script>
+
+    const apiSpecs = {{API_SPEC_JSON}};
+
+    const app = document.getElementById("app");
+
+
+    Object.entries(apiSpecs)
+        .forEach(([endpoint, scenarios]) => {
+
+
+            const api = document.createElement("div");
+
+            api.className = "api";
+
+
+            api.innerHTML = `
+        <h2>${endpoint}</h2>
+    `;
+
+
+            scenarios.forEach(spec => {
+
+
+                api.innerHTML += `
+
+        <div class="scenario">
+
+            <h3>
+                ${spec.scenario}
+            </h3>
+
+            <p>
+                ${spec.expectation}
+            </p>
+
+
+            <h4>Request</h4>
+
+            <pre>
+${JSON.stringify(spec.request, null, 2)}
+            </pre>
+
+
+            <h4>Response</h4>
+
+            <pre>
+${JSON.stringify(spec.response, null, 2)}
+            </pre>
+
+        </div>
+
+        `
+
+            });
+
+
+            app.appendChild(api);
+
+        });
+
+
+</script>
+
+</body>
+</html>

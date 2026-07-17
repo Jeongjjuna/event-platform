@@ -1,11 +1,26 @@
 package io.kotest.provided
 
-data class ScenarioReport(
-    val describe: String,
-    val context: String,
-    val it: String,
-    val status: Int?,
-    val duration: Long,
-    val request: Any?,
-    val response: Any?,
+import tools.jackson.databind.JsonNode
+
+data class ApiSpec(
+    val endpoint: String,
+    val request: RequestSpec,
+    val scenarios: MutableList<ApiScenario>
+)
+
+data class RequestSpec(
+    val hasAuthorization: Boolean,
+    val body: JsonNode?
+)
+
+data class ApiScenario(
+    val description: String,
+    val expectation: String,
+    val response: ResponseSpec
+)
+
+data class ResponseSpec(
+    val status: Int,
+    val serviceName: String?,
+    val body: JsonNode?
 )

@@ -69,6 +69,8 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:6.2.2")
     testImplementation("io.kotest:kotest-assertions-core:6.2.2")
     testImplementation("io.kotest:kotest-extensions-spring:6.2.2")
+
+    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
 }
 
 kotlin {
