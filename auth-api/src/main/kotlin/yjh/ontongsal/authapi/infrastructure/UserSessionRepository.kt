@@ -24,8 +24,8 @@ class UserSessionRepository(
 
         if (updated == 0) {
             UserSessionTable.insert {
-                it[UserSessionTable.userId] = userId
-                it[UserSessionTable.refreshToken] = refreshToken
+                it[UserSessionTable.userId] = user.id
+                it[UserSessionTable.refreshToken] = jwtToken.refreshToken
                 it[UserSessionTable.updatedAt] = user.updatedAt
             }
         }

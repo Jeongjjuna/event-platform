@@ -19,6 +19,7 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.sql.Date
 import java.time.Instant
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -51,6 +52,7 @@ class JwtTokenProvider(
         val exp = now.plus(jwtProperties.accessTokenExpiration)
 
         return Jwts.builder()
+            .id(UUID.randomUUID().toString())
             .subject(user.id.toString())
             .issuer(jwtProperties.issuer)
             .issuedAt(Date.from(now))
@@ -68,6 +70,7 @@ class JwtTokenProvider(
         val exp = now.plus(jwtProperties.accessTokenExpiration)
 
         return Jwts.builder()
+            .id(UUID.randomUUID().toString())
             .subject(jwtUserInfo.userId.toString())
             .issuer(jwtProperties.issuer)
             .issuedAt(Date.from(now))
@@ -87,6 +90,7 @@ class JwtTokenProvider(
         val exp = now.plus(jwtProperties.refreshTokenExpiration)
 
         return Jwts.builder()
+            .id(UUID.randomUUID().toString())
             .subject(user.id.toString())
             .issuer(jwtProperties.issuer)
             .issuedAt(Date.from(now))
@@ -103,6 +107,7 @@ class JwtTokenProvider(
         val exp = now.plus(jwtProperties.refreshTokenExpiration)
 
         return Jwts.builder()
+            .id(UUID.randomUUID().toString())
             .subject(jwtUserInfo.userId.toString())
             .issuer(jwtProperties.issuer)
             .issuedAt(Date.from(now))

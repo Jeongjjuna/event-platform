@@ -36,7 +36,7 @@ class SecurityConfig(
         }
     }
 
-    @Profile("local", "test")
+    @Profile("local", "integration-test")
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
