@@ -43,7 +43,9 @@
 <script lang="ts" setup>
 import { signUpAPI } from "~/services/auth.service";
 
+const { handleApiError } = useApiError();
 const router = useRouter();
+
 const form = reactive({
   email: "",
   password: "",
@@ -55,17 +57,10 @@ const handleSignup = async () => {
       email: form.email,
       password: form.password,
     });
-
-    console.log("회원가입 성공");
+    alert("회원가입에 성공했습니다.");
     await router.push("/auth/login");
-  } catch (error: any) {
-    const response = error.response;
-    if (response.headers.get("X-Service-Name")) {
-      alert(`${error.data.code}: ${error.data.message}`);
-      return;
-    }
-    console.error("Unknown system error", error);
-    console.error("HTTP Status:", response?.status);
+  } catch (error) {
+    handleApiError(error);
   }
 };
 </script>
