@@ -4,10 +4,8 @@
   >
     <div class="flex items-center">
       <img src="/assets/icons/header-image.svg" alt="" class="h-10" />
-
       <NuxtLink to="/" class="ml-2 text-2xl font-semibold tracking-tight"> Event Web Header </NuxtLink>
     </div>
-
     <button type="button" class="overflow-hidden rounded-full transition hover:opacity-80">
       <img :src="profileImage" alt="프로필" class="h-10 w-10 rounded-full object-cover" />
     </button>
