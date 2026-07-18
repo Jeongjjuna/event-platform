@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.provided.ApiReportContext
 import org.jetbrains.exposed.v1.jdbc.deleteAll
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -48,6 +49,9 @@ class SessionRefreshIntegrationTest(
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonMapper.writeValueAsString(payload))
             .exchange()
+        .also {
+            ApiReportContext.record(it)
+        }
 
     fun cleanDatabase() = transaction {
         UserSessionTable.deleteAll()
