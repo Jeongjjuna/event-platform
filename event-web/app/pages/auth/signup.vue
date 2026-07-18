@@ -5,7 +5,7 @@
         <h1 class="text-3xl font-bold tracking-tight">회원가입</h1>
         <p class="mt-2 text-sm text-gray-500">Event Web 서비스를 이용하기 위한 계정을 생성합니다.</p>
       </div>
-      <form class="space-y-6" @submit.prevent="handleSignup">
+      <form class="space-y-6">
         <div class="space-y-2">
           <label class="text-sm font-medium" for="email"> 이메일 </label>
           <input
@@ -30,7 +30,8 @@
         </div>
         <button
           class="h-10 w-full rounded-md bg-black text-sm font-medium text-white transition hover:bg-gray-800"
-          type="submit"
+          @click="handleSignup"
+          type="button"
         >
           회원가입
         </button>
@@ -40,15 +41,31 @@
 </template>
 
 <script lang="ts" setup>
+import { signUpAPI } from "~/services/auth.service";
+
+const router = useRouter();
 const form = reactive({
   email: "",
   password: "",
 });
 
-const handleSignup = () => {
-  console.log({
-    email: form.email,
-    password: form.password,
-  });
+const handleSignup = async () => {
+  try {
+    await signUpAPI({
+      email: form.email,
+      password: form.password,
+    });
+
+    console.log("회원가입 성공");
+    await router.push("/auth/login");
+  } catch (error: any) {
+    const response = error.response;
+    if (response.headers.get("X-Service-Name")) {
+      alert(`${error.data.code}: ${error.data.message}`);
+      return;
+    }
+    console.error("Unknown system error", error);
+    console.error("HTTP Status:", response?.status);
+  }
 };
 </script>
