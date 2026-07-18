@@ -45,53 +45,104 @@ class ApiReportListener : TestListener, AfterProjectListener {
         specs: Map<String, ApiSpec>
     ): String {
         return buildString {
-            appendLine("# API Specification")
+
+            appendLine("# [AUTH API] API Specification")
             appendLine()
+
             specs.values.forEach { api ->
-                appendLine(
-                    "## ${api.endpoint}"
-                )
-                appendLine()
-                appendLine("## Request")
-                appendLine()
-                appendLine("### Header")
+                appendLine("<details>")
                 appendLine()
                 appendLine(
-                    "| Header | Required |"
+                    """
+                <summary style="
+                    background:${httpMethodColor(api.endpoint)};
+                    padding:16px;
+                    border-radius:10px;
+                    margin-bottom:16px;
+                    cursor:pointer;
+                    font-size:22px;
+                    font-weight:700;
+                    color:#1e293b;
+                ">
+                """.trimIndent()
                 )
-                appendLine(
-                    "|---|---|"
-                )
-                appendLine(
-                    "| Authorization | ${api.request.hasAuthorization} |"
-                )
+                appendLine("📌 ${api.endpoint}")
+                appendLine("</summary>")
                 appendLine()
-                appendLine("### Body")
+
+                // API 컴포넌트 내부 시작
+                appendLine("### Request")
                 appendLine()
-                appendJson(
-                    api.request.body
-                )
+                appendLine("#### Headers")
+
+                appendLine("| Header | Required |")
+                appendLine("|---|---|")
+                appendLine("| Authorization | ${api.request.hasAuthorization.toString().uppercase()} |")
                 appendLine()
-                appendLine("## Response")
+
+                appendLine("#### Body")
                 appendLine()
+                appendJson(api.request.body)
+                appendLine()
+
+                appendLine("---")
+                appendLine()
+
+                appendLine("### Response")
+                appendLine()
+
+                // Response 컴포넌트 내부 시작
                 api.scenarios.forEach { scenario ->
-                    appendLine("### ${scenario.description}")
+                    appendLine("<details>")
                     appendLine()
-                    appendLine("**Expected**")
+                    appendLine(
+                        """
+                    <summary style="
+                        background:#646f7b;
+                        padding:12px;
+                        border-radius:4px;
+                        margin-bottom:8px;
+                        cursor:pointer;
+                        font-size:17px;
+                        font-weight:600;
+                    ">
+                    """.trimIndent()
+                    )
+                    appendLine("🧊 ${scenario.response.status} - ${scenario.description}")
+                    appendLine("</summary>")
                     appendLine()
-                    appendLine(scenario.expectation)
+
+                    appendLine("> **Expected**")
+                    appendLine(">")
+                    appendLine("> ${scenario.expectation}")
                     appendLine()
-                    appendLine("| Status | Service |")
+
+                    appendLine("| 항목 | 값 |")
                     appendLine("|---|---|")
-                    appendLine("| ${scenario.response.status} | ${scenario.response.serviceName} |")
+                    appendLine("| HTTP Status | `${scenario.response.status}` |")
+                    appendLine("| X-Service-Name | ${scenario.response.serviceName ?: "-"} |")
                     appendLine()
-                    appendLine("Body")
+
+                    appendLine("#### Response Body")
                     appendJson(scenario.response.body)
                     appendLine()
-                    appendLine("---")
+                    appendLine("</details>")
                     appendLine()
                 }
+
+                appendLine("</details>")
+                appendLine()
             }
+        }
+    }
+
+    private fun httpMethodColor(endpoint: String): String {
+        return when {
+            endpoint.startsWith("GET") -> "#dcfce7"     // 연한 초록
+            endpoint.startsWith("POST") -> "#dbeafe"    // 연한 파랑
+            endpoint.startsWith("PATCH") -> "#fef3c7"   // 연한 노랑
+            endpoint.startsWith("DELETE") -> "#fee2e2"  // 연한 빨강
+            else -> "#e2e8f0"
         }
     }
 
