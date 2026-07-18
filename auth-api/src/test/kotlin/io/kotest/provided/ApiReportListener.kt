@@ -8,7 +8,7 @@ import io.kotest.core.test.TestType
 import io.kotest.engine.test.TestResult
 import org.springframework.test.web.servlet.assertj.MvcTestResult
 import tools.jackson.databind.JsonNode
-import tools.jackson.module.kotlin.jsonMapper
+import tools.jackson.databind.json.JsonMapper
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
@@ -17,6 +17,7 @@ class ApiReportListener : TestListener, AfterProjectListener {
 
     private val specs = ConcurrentHashMap<String, ApiSpec>()
     private val yamlMapper = YAMLMapper()
+    private val jsonMapper = JsonMapper()
 
     override suspend fun afterProject() {
 
@@ -45,10 +46,8 @@ class ApiReportListener : TestListener, AfterProjectListener {
         specs: Map<String, ApiSpec>
     ): String {
         return buildString {
-
             appendLine("# [AUTH API] API Specification")
             appendLine()
-
             specs.values.forEach { api ->
                 appendLine("<details>")
                 appendLine()
@@ -64,27 +63,32 @@ class ApiReportListener : TestListener, AfterProjectListener {
                     font-weight:700;
                     color:#1e293b;
                 ">
+                📌 ${api.endpoint}
+                </summary>
                 """.trimIndent()
                 )
-                appendLine("📌 ${api.endpoint}")
-                appendLine("</summary>")
                 appendLine()
 
                 // API 컴포넌트 내부 시작
                 appendLine("### Request")
                 appendLine()
+
                 appendLine("#### Headers")
+                appendLine()
 
                 appendLine("| Header | Required |")
                 appendLine("|---|---|")
                 appendLine("| Authorization | ${api.request.hasAuthorization.toString().uppercase()} |")
                 appendLine()
 
-                appendLine("#### Body")
+                appendLine("#### Body Example")
                 appendLine()
-                appendJson(api.request.body)
+                appendJson(api.request.bodyExample)
                 appendLine()
 
+                appendLine("#### Body Schema")
+                appendLine()
+                appendJson(api.request.bodySchema)
                 appendLine("---")
                 appendLine()
 
@@ -106,10 +110,10 @@ class ApiReportListener : TestListener, AfterProjectListener {
                         font-size:17px;
                         font-weight:600;
                     ">
+                    🧊 ${scenario.response.status} - ${scenario.description}
+                    </summary>
                     """.trimIndent()
                     )
-                    appendLine("🧊 ${scenario.response.status} - ${scenario.description}")
-                    appendLine("</summary>")
                     appendLine()
 
                     appendLine("> **Expected**")
@@ -122,9 +126,16 @@ class ApiReportListener : TestListener, AfterProjectListener {
                     appendLine("| HTTP Status | `${scenario.response.status}` |")
                     appendLine("| X-Service-Name | ${scenario.response.serviceName ?: "-"} |")
                     appendLine()
+                    appendLine("#### Response Body Example")
+                    appendLine()
+                    appendJson(scenario.response.bodyExample)
+                    appendLine()
+                    appendLine("#### Response Body Schema")
+                    appendLine()
+                    appendJson(
+                        scenario.response.bodySchema
+                    )
 
-                    appendLine("#### Response Body")
-                    appendJson(scenario.response.body)
                     appendLine()
                     appendLine("</details>")
                     appendLine()
@@ -177,14 +188,13 @@ class ApiReportListener : TestListener, AfterProjectListener {
             mvcTestResult
         )
 
-        specs.compute(
-            endpoint
-        ) { _, existing ->
+        specs.compute(endpoint) { _, existing ->
             val apiSpec = existing ?: ApiSpec(
-                        endpoint = endpoint,
-                        request = createRequestSpec(mvcTestResult),
-                        scenarios = mutableListOf()
-                    )
+                endpoint = endpoint,
+                request = createRequestSpec(mvcTestResult),
+                scenarios = mutableListOf()
+            )
+
             apiSpec.scenarios.add(scenario)
             apiSpec
         }
@@ -196,6 +206,7 @@ class ApiReportListener : TestListener, AfterProjectListener {
     ): ApiScenario {
         val names = buildHierarchy(testCase)
         val response = mvcTestResult.mvcResult.response
+        val bodyExample = parseJson(response.contentAsString)
 
         return ApiScenario(
             description = names
@@ -204,10 +215,11 @@ class ApiReportListener : TestListener, AfterProjectListener {
                 .joinToString(" "),
             expectation = names.last(),
             response = ResponseSpec(
-                    status = response.status,
-                    serviceName = response.getHeader("X-Service-Name"),
-                    body = parseJson(response.contentAsString)
-                )
+                status = response.status,
+                serviceName = response.getHeader("X-Service-Name"),
+                bodyExample = bodyExample,
+                bodySchema = bodyExample?.let { generateSchema(it) }
+            )
         )
     }
 
@@ -215,11 +227,36 @@ class ApiReportListener : TestListener, AfterProjectListener {
         mvcTestResult: MvcTestResult
     ): RequestSpec {
         val request = mvcTestResult.mvcResult.request
+        val bodyExample = parseJson(request.contentAsString)
         return RequestSpec(
             hasAuthorization = request.getHeader("Authorization") != null,
-            body = parseJson(request.contentAsString)
+            bodyExample = bodyExample,
+            bodySchema = bodyExample?.let { generateSchema(it) }
         )
     }
+
+    private fun generateSchema(node: JsonNode?): JsonNode? =
+        node?.let {
+            when {
+                it.isObject -> jsonMapper.createObjectNode().apply {
+                    it.properties().forEach { (key, value) ->
+                            put(key, generateType(value))
+                        }
+                }
+                else -> jsonMapper.createObjectNode()
+            }
+        }
+
+    private fun generateType(node: JsonNode): String =
+        when {
+            node.isString -> "string"
+            node.isNumber -> "number"
+            node.isBoolean -> "boolean"
+            node.isNull -> "null"
+            node.isArray -> "array"
+            node.isObject -> "object"
+            else -> "unknown"
+        }
 
     private fun parseJson(
         value: String?
@@ -227,7 +264,7 @@ class ApiReportListener : TestListener, AfterProjectListener {
         if (value.isNullOrBlank()) {
             return null
         }
-        return jsonMapper().readTree(value)
+        return jsonMapper.readTree(value)
     }
 
     private fun buildHierarchy(

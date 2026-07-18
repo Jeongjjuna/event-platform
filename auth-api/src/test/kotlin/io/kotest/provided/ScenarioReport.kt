@@ -10,7 +10,9 @@ data class ApiSpec(
 
 data class RequestSpec(
     val hasAuthorization: Boolean,
-    val body: JsonNode?
+    val bodyExample: JsonNode?,
+    val bodySchema: JsonNode?
+//    val body: JsonNode?
 )
 
 data class ApiScenario(
@@ -22,5 +24,7 @@ data class ApiScenario(
 data class ResponseSpec(
     val status: Int,
     val serviceName: String?,
-    val body: JsonNode?
+    val bodyExample: JsonNode?,
+    val bodySchema: JsonNode?
+//    val body: JsonNode?
 )
