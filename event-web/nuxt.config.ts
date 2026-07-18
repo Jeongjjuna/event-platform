@@ -7,5 +7,14 @@ export default defineNuxtConfig({
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
     }
+  },
+  modules: ['@nuxtjs/tailwindcss', 'nuxt-lucide-icons'],
+
+  tailwindcss: {
+    // Options
+  },
+
+  lucide: {
+    namePrefix: 'Icon'
   }
 })
