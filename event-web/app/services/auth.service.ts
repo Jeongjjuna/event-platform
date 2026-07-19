@@ -1,5 +1,4 @@
 import type { SuccessResponse } from "~/types/api";
-import { useApi } from "~/composables/useApi";
 
 // 회원가입
 export interface SignUpRequest {
@@ -23,7 +22,6 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   accessToken: string;
-  refreshToken: string;
   user: LoginUserResponse;
 }
 
@@ -38,25 +36,28 @@ export const loginAPI = (request: LoginRequest) => {
   const api = useApi();
   return api<SuccessResponse<LoginResponse>>("/api/v1/users/login", {
     method: "POST",
-    body: request,
+    body: request
   });
 };
 
 // 토큰 재발급
-export interface RefreshTokenRequest {
-  refreshToken: string;
-}
-
 export interface RefreshResponse {
   accessToken: string;
-  refreshToken: string;
+  user: RefreshUserResponse;
 }
 
-export const refreshTokenAPI = (request: RefreshTokenRequest) => {
+export interface RefreshUserResponse {
+  id: number;
+  email: string;
+  roles: string;
+  registeredAt: string;
+}
+
+export const refreshTokenAPI = () => {
   const api = useApi();
+
   return api<SuccessResponse<RefreshResponse>>("/api/v1/users/refresh", {
-    method: "POST",
-    body: request,
+    method: "POST"
   });
 };
 
@@ -68,13 +69,10 @@ export interface MeResponse {
   registeredAt: string;
 }
 
-export const getMeAPI = (accessToken: string) => {
+export const getMeAPI = () => {
   const api = useApi();
   return api<SuccessResponse<MeResponse>>("/api/v1/users/me", {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    method: "GET"
   });
 };
 
@@ -84,35 +82,26 @@ export interface ChangePasswordRequest {
   newPassword: string;
 }
 
-export const changePasswordAPI = (accessToken: string, request: ChangePasswordRequest) => {
+export const changePasswordAPI = (request: ChangePasswordRequest) => {
   const api = useApi();
   return api<SuccessResponse<null>>("/api/v1/users/me/password", {
     method: "PATCH",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
     body: request,
   });
 };
 
 // 회원 탈퇴
-export const withdrawAPI = (accessToken: string) => {
+export const withdrawAPI = () => {
   const api = useApi();
   return api<SuccessResponse<null>>("/api/v1/users/me", {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    method: "DELETE"
   });
 };
 
 // 로그아웃
-export const logoutAPI = (accessToken: string) => {
+export const logoutAPI = () => {
   const api = useApi();
   return api<SuccessResponse<null>>("/api/v1/users/logout", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    method: "POST"
   });
 };

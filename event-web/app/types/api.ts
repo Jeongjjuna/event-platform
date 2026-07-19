@@ -4,7 +4,7 @@ export interface ApiResponse {
 }
 
 export interface SuccessResponse<T> extends ApiResponse {
-  data: T | null;
+  data: T;
 }
 
 export interface ErrorResponse extends ApiResponse {
@@ -13,6 +13,6 @@ export interface ErrorResponse extends ApiResponse {
 }
 
 export interface ErrorDetail {
-  field: string | null;
+  field: string;
   reason: string;
 }
