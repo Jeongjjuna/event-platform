@@ -6,6 +6,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.provided.ApiReportContext
+import jakarta.servlet.http.Cookie
 import org.jetbrains.exposed.v1.jdbc.deleteAll
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -18,7 +19,6 @@ import yjh.ontongsal.authapi.config.KotestIntegrationTest
 import yjh.ontongsal.authapi.domain.UserRole
 import yjh.ontongsal.authapi.infrastructure.UserSessionTable
 import yjh.ontongsal.authapi.infrastructure.UserTable
-import yjh.ontongsal.authapi.presentation.request.RefreshRequest
 import yjh.ontongsal.authapi.presentation.response.RefreshResponse
 import yjh.ontongsal.authapi.shared.response.SuccessResponse
 import yjh.ontongsal.authapi.shared.security.jwt.JwtTokenProvider
@@ -40,14 +40,12 @@ class SessionRefreshIntegrationTest(
     private val credentialEncoder: CredentialEncoder,
 ) : DescribeSpec({
 
-    val payload = RefreshRequest("default-refresh-token")
-
-    fun tokenRefreshAPI(payload: RefreshRequest) =
+    fun tokenRefreshAPI(refreshToken: String) =
         mockMvcTester
             .post()
             .uri("/api/{version}/users/refresh", "v1")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(jsonMapper.writeValueAsString(payload))
+            .cookie(Cookie("refreshToken", refreshToken))
             .exchange()
         .also {
             ApiReportContext.record(it)
@@ -108,7 +106,7 @@ class SessionRefreshIntegrationTest(
                 dbInsertSession(userId = userId, refreshToken = refreshToken)
 
                 // when
-                val result = tokenRefreshAPI(payload.copy(refreshToken = refreshToken))
+                val result = tokenRefreshAPI(refreshToken)
 
                 // then
                 result.response.getHeader("X-Service-Name") shouldBe "auth-api"
@@ -138,7 +136,7 @@ class SessionRefreshIntegrationTest(
 
                 // when
                 // 발급받은 정상 토큰이 아니라, 형식 자체가 잘못된 문자열("invalid-token")로 요청
-                val result = tokenRefreshAPI(payload.copy(refreshToken = "invalid-token"))
+                val result = tokenRefreshAPI("invalid-token")
 
                 // then
                 result.response.getHeader("X-Service-Name") shouldBe "auth-api"
@@ -161,7 +159,7 @@ class SessionRefreshIntegrationTest(
                 // session 미등록
 
                 // when
-                val result = tokenRefreshAPI(payload.copy(refreshToken = refreshToken))
+                val result = tokenRefreshAPI(refreshToken)
 
                 // then
                 result.response.getHeader("X-Service-Name") shouldBe "auth-api"
@@ -186,7 +184,7 @@ class SessionRefreshIntegrationTest(
 
                 // when
                 // 세션에 저장된 토큰과 요청 토큰이 불일치하는 상황을 재현
-                val result = tokenRefreshAPI(payload.copy(refreshToken = differentRefreshToken))
+                val result = tokenRefreshAPI(differentRefreshToken)
 
                 // then
                 result.response.getHeader("X-Service-Name") shouldBe "auth-api"
@@ -209,8 +207,7 @@ class SessionRefreshIntegrationTest(
                 dbInsertSession(userId = 999L, refreshToken = refreshToken)
 
                 // when
-                val payload = payload.copy(refreshToken = refreshToken)
-                val result = tokenRefreshAPI(payload)
+                val result = tokenRefreshAPI(refreshToken)
 
                 // then
                 result.response.getHeader("X-Service-Name") shouldBe "auth-api"

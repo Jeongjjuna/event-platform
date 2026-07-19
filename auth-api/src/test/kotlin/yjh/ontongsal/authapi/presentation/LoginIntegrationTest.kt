@@ -103,7 +103,6 @@ class LoginIntegrationTest(
                     message shouldBe "OK"
                     with(data.shouldNotBeNull()) {
                         accessToken shouldNotBe ""
-                        refreshToken shouldNotBe ""
                         with(user.shouldNotBeNull()) {
                             id shouldBe 1L
                             email shouldBe payload.email
