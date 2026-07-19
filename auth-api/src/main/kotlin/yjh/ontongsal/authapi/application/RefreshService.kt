@@ -1,7 +1,7 @@
 package yjh.ontongsal.authapi.application
 
 import org.springframework.stereotype.Service
-import yjh.ontongsal.authapi.domain.JwtToken
+import yjh.ontongsal.authapi.domain.RefreshResult
 import yjh.ontongsal.authapi.shared.persistence.TransactionRunner
 import yjh.ontongsal.authapi.shared.security.jwt.TokenType
 
@@ -13,7 +13,7 @@ class RefreshService(
     private val tokenManager: TokenManager
 ) {
 
-    fun refreshToken(refreshToken: String): JwtToken {
+    fun refreshToken(refreshToken: String): RefreshResult {
         return transaction.run {
             val jwtUserInfo = tokenManager.parseToken(refreshToken, TokenType.REFRESH)
 
@@ -24,8 +24,7 @@ class RefreshService(
             val newJwtToken = tokenManager.issue(user);
 
             sessionManager.append(user, newJwtToken)
-
-            return@run newJwtToken
+            return@run RefreshResult(user, newJwtToken)
         }
 
     }

@@ -6,7 +6,6 @@ import java.time.Instant
 
 data class LoginResponse(
     val accessToken: String,
-    val refreshToken: String,
     val user: UserResponse,
 ) {
 
@@ -20,7 +19,6 @@ data class LoginResponse(
     companion object {
         fun from(loginResult: LoginResult) = LoginResponse(
             accessToken = loginResult.jwtToken.accessToken,
-            refreshToken = loginResult.jwtToken.refreshToken,
             user = UserResponse(
                 id = loginResult.user.id,
                 email = loginResult.user.email,

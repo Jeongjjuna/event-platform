@@ -1,13 +1,14 @@
 package yjh.ontongsal.authapi.presentation
 
 import jakarta.validation.Valid
+import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseCookie
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import yjh.ontongsal.authapi.application.*
 import yjh.ontongsal.authapi.presentation.request.ChangePasswordRequest
 import yjh.ontongsal.authapi.presentation.request.LoginRequest
-import yjh.ontongsal.authapi.presentation.request.RefreshRequest
 import yjh.ontongsal.authapi.presentation.request.SignUpRequest
 import yjh.ontongsal.authapi.presentation.response.LoginResponse
 import yjh.ontongsal.authapi.presentation.response.MyInfoResponse
@@ -15,6 +16,7 @@ import yjh.ontongsal.authapi.presentation.response.RefreshResponse
 import yjh.ontongsal.authapi.shared.response.ApiController
 import yjh.ontongsal.authapi.shared.response.ApiResponseEntity
 import yjh.ontongsal.authapi.shared.security.SecurityUserDetails
+import java.time.Duration
 
 @RequestMapping("/api/{version}/users")
 @RestController
@@ -40,15 +42,39 @@ class UserController(
         @Valid @RequestBody loginRequest: LoginRequest
     ): ApiResponseEntity<LoginResponse> {
         val loginResult = loginService.login(loginRequest.toCommand())
-        return ok(LoginResponse.from(loginResult))
+
+        // refresh token 은 http only 헤더를 통해 쿠키 저장.
+        val cookie = ResponseCookie.from("refreshToken", loginResult.jwtToken.refreshToken)
+            .httpOnly(true)
+            .secure(false) // 운영에서 true
+            .sameSite("Strict")
+            .path("/")
+            .maxAge(Duration.ofDays(14))
+            .build()
+
+        val headers = HttpHeaders().apply {
+            add(HttpHeaders.SET_COOKIE, cookie.toString())
+        }
+        return ok(data = LoginResponse.from(loginResult), headers = headers)
     }
 
     @PostMapping(value = ["/refresh"], version = "v1")
     fun refresh(
-        @Valid @RequestBody refreshRequest: RefreshRequest
+        @CookieValue("refreshToken") refreshToken: String,
     ): ApiResponseEntity<RefreshResponse> {
-        val jwtToken = refreshService.refreshToken(refreshRequest.refreshToken)
-        return ok(RefreshResponse.from(jwtToken))
+        val refreshResult = refreshService.refreshToken(refreshToken)
+
+        val cookie = ResponseCookie.from("refreshToken", refreshResult.jwtToken.refreshToken)
+            .httpOnly(true)
+            .secure(false) // 운영에서 true
+            .sameSite("Strict")
+            .path("/")
+            .maxAge(Duration.ofDays(14))
+            .build()
+        val headers = HttpHeaders().apply {
+            add(HttpHeaders.SET_COOKIE, cookie.toString())
+        }
+        return ok(data = RefreshResponse.from(refreshResult), headers = headers)
     }
 
 
@@ -58,7 +84,19 @@ class UserController(
         @AuthenticationPrincipal principal: SecurityUserDetails,
     ): ApiResponseEntity<Unit> {
         logoutService.logout(principal.userId)
-        return ok()
+
+        val cookie = ResponseCookie.from("refreshToken", "")
+            .httpOnly(true)
+            .secure(false) // 로그인과 동일
+            .sameSite("Strict")
+            .path("/")     // 로그인과 동일
+            .maxAge(Duration.ZERO)
+            .build()
+
+        val headers = HttpHeaders().apply {
+            add(HttpHeaders.SET_COOKIE, cookie.toString())
+        }
+        return ok(headers = headers)
     }
 
     @PreAuthorize("hasAuthority('USER')")

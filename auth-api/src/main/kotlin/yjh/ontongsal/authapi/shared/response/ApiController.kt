@@ -1,5 +1,6 @@
 package yjh.ontongsal.authapi.shared.response
 
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
@@ -12,8 +13,11 @@ interface ApiController {
 
     fun <T> ok(
         data: T? = null,
+        headers: HttpHeaders = HttpHeaders(),
     ): ApiResponseEntity<T> = ResponseEntity
-        .ok(
+        .ok()
+        .headers(headers)
+        .body(
             SuccessResponse(
                 code = 200,
                 message = HttpStatus.OK.reasonPhrase,
