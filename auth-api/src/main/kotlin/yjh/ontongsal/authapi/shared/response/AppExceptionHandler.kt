@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.authorization.AuthorizationDeniedException
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.MissingRequestCookieException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -169,7 +170,7 @@ class AppExceptionHandler {
             )
     }
 
-    // 4. HttpMessageNotReadableException (요청 바디 파싱 실패)
+    // 5. HttpMessageNotReadableException (요청 바디 파싱 실패)
     @ExceptionHandler(value = [HttpMessageNotReadableException::class])
     fun handleHttpMessageNotReadableException(
         e: HttpMessageNotReadableException,
@@ -186,6 +187,30 @@ class AppExceptionHandler {
         val error = ErrorDetail(
             field = "requestBody",
             reason = reason
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                ErrorResponse(
+                    code = HttpStatus.BAD_REQUEST.value(),
+                    message = HttpStatus.BAD_REQUEST.reasonPhrase,
+                    details = listOf(error)
+                )
+            )
+    }
+
+    // 5. @CookieValue(required = true) 쿠키 누락
+    @ExceptionHandler(value = [MissingRequestCookieException::class])
+    fun handleMissingRequestCookieException(
+        e: MissingRequestCookieException,
+    ): ResponseEntity<ErrorResponse> {
+
+        log.info { "[ExceptionHandler] Missing Request Cookie" }
+
+        val error = ErrorDetail(
+            field = e.cookieName,
+            reason = "required cookie is missing"
         )
 
         return ResponseEntity
