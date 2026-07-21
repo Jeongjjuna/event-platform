@@ -1,4 +1,4 @@
-import type { SuccessResponse } from "~/types/api";
+import { type SuccessResponse } from "~/types/api";
 
 // 회원가입
 export interface SignUpRequest {
@@ -7,8 +7,7 @@ export interface SignUpRequest {
 }
 
 export const signUpAPI = (request: SignUpRequest) => {
-  const api = useApi();
-  return api<SuccessResponse<null>>("/api/v1/users/signup", {
+  return $api<SuccessResponse<null>>("/api/v1/users/signup", {
     method: "POST",
     body: request,
   });
@@ -33,31 +32,9 @@ export interface LoginUserResponse {
 }
 
 export const loginAPI = (request: LoginRequest) => {
-  const api = useApi();
-  return api<SuccessResponse<LoginResponse>>("/api/v1/users/login", {
+  return $api<SuccessResponse<LoginResponse>>("/api/v1/users/login", {
     method: "POST",
     body: request
-  });
-};
-
-// 토큰 재발급
-export interface RefreshResponse {
-  accessToken: string;
-  user: RefreshUserResponse;
-}
-
-export interface RefreshUserResponse {
-  id: number;
-  email: string;
-  roles: string;
-  registeredAt: string;
-}
-
-export const refreshTokenAPI = () => {
-  const api = useApi();
-
-  return api<SuccessResponse<RefreshResponse>>("/api/v1/users/refresh", {
-    method: "POST"
   });
 };
 
@@ -70,8 +47,7 @@ export interface MeResponse {
 }
 
 export const getMeAPI = () => {
-  const api = useApi();
-  return api<SuccessResponse<MeResponse>>("/api/v1/users/me", {
+  return $api<SuccessResponse<MeResponse>>("/api/v1/users/me", {
     method: "GET"
   });
 };
@@ -83,8 +59,7 @@ export interface ChangePasswordRequest {
 }
 
 export const changePasswordAPI = (request: ChangePasswordRequest) => {
-  const api = useApi();
-  return api<SuccessResponse<null>>("/api/v1/users/me/password", {
+  return $api<SuccessResponse<null>>("/api/v1/users/me/password", {
     method: "PATCH",
     body: request,
   });
@@ -92,16 +67,14 @@ export const changePasswordAPI = (request: ChangePasswordRequest) => {
 
 // 회원 탈퇴
 export const withdrawAPI = () => {
-  const api = useApi();
-  return api<SuccessResponse<null>>("/api/v1/users/me", {
+  return $api<SuccessResponse<null>>("/api/v1/users/me", {
     method: "DELETE"
   });
 };
 
 // 로그아웃
 export const logoutAPI = () => {
-  const api = useApi();
-  return api<SuccessResponse<null>>("/api/v1/users/logout", {
+  return $api<SuccessResponse<null>>("/api/v1/users/logout", {
     method: "POST"
   });
 };
