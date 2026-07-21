@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { refreshTokenAPI } from "~/services/auth.service";
 
 export const useAuthStore = defineStore("auth", () => {
   const accessToken = ref<string | null>(null);
@@ -27,16 +26,8 @@ export const useAuthStore = defineStore("auth", () => {
     registeredAt.value = newRegisteredAt;
   };
 
-  const refresh = async () => {
-    const response = await refreshTokenAPI();
-
-    login(
-      response.data.accessToken,
-      response.data.user.id,
-      response.data.user.email,
-      response.data.user.roles,
-      response.data.user.registeredAt,
-    );
+  const updateAccessToken = (newAccessToken: string) => {
+    accessToken.value = newAccessToken;
   };
 
   const logout = () => {
@@ -57,8 +48,8 @@ export const useAuthStore = defineStore("auth", () => {
 
     isLogin,
 
+    updateAccessToken,
     login,
-    refresh,
     logout,
   };
 });
